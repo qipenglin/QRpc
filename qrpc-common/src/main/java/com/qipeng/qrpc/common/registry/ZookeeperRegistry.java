@@ -86,7 +86,10 @@ public class ZookeeperRegistry implements Registry {
         if (!zkClient.checkExists(providerPath)) {
             zkClient.createPerNode(providerPath);
         }
-        zkClient.createEphNode(providerPath + "/" + serverAddr);
+        String addrPath = providerPath + "/" + serverAddr;
+        if (!zkClient.checkExists(addrPath)) {
+            zkClient.createEphNode(addrPath);
+        }
         return true;
     }
 

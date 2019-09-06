@@ -16,9 +16,14 @@ public class PacketCodecHandler extends MessageToMessageCodec<ByteBuf, RpcPacket
         super();
     }
 
-    private static Map<Byte, Class<? extends RpcPacket>> packetTypeMap = new HashMap<>();
-
     private static final int MAGIC_NUM = 0x12345678;
+
+
+    private static Map<Byte, Class<? extends RpcPacket>> packetTypeMap = new HashMap<>();
+    static {
+        packetTypeMap.put(RpcPacket.PacketType.REQUEST,RpcRequest.class);
+        packetTypeMap.put(RpcPacket.PacketType.RESPONSE,RpcResponse.class);
+    }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {

@@ -7,7 +7,7 @@ public class RpcResponse extends RpcPacket {
 
     private Object result;
 
-    private String resultType;
+    private Boolean hasException;
 
     @Override
     public Byte getPacketType() {
