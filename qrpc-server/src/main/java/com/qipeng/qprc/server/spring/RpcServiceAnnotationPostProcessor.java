@@ -1,7 +1,6 @@
 package com.qipeng.qprc.server.spring;
 
 import com.qipeng.qprc.server.RpcServer;
-import com.qipeng.qprc.server.RpcServerFactory;
 import com.qipeng.qprc.server.ServiceProvider;
 import com.qipeng.qprc.server.annotation.RpcService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +13,8 @@ import org.springframework.stereotype.Component;
 public class RpcServiceAnnotationPostProcessor implements BeanPostProcessor {
 
     @Override
-    public Object postProcessBeforeInitialization(Object o, String s) throws BeansException {
-        return null;
+    public Object postProcessBeforeInitialization(Object bean, String s) throws BeansException {
+        return bean;
     }
 
     @Override
@@ -35,6 +34,6 @@ public class RpcServiceAnnotationPostProcessor implements BeanPostProcessor {
             provider.setInstance(bean);
             RpcServer.PROVIDER_MAP.put(serviceInterface.getName(), provider);
         }
-        return null;
+        return bean;
     }
 }

@@ -1,25 +1,25 @@
 package com.qipeng.qrpc.client;
 
 import com.qipeng.qrpc.common.RpcResponse;
+import com.qipeng.qrpc.common.exception.RpcException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
-public class RpcFuture {
+@Slf4j
+class RpcFuture {
 
     private static final int timeout = 30000;
 
     static Map<Integer, RpcFuture> futureMap = new ConcurrentHashMap<>();
 
-    private ReentrantLock lock = new ReentrantLock();
-
     @Getter
-    private Condition condition = lock.newCondition();
+    private CountDownLatch latch = new CountDownLatch(1);
 
     @Getter
     private Integer requestId;
@@ -36,18 +36,18 @@ public class RpcFuture {
     }
 
     RpcResponse get() {
-        try {
-            lock.lock();
-            while (!isTimeout() && response == null) {
-                condition.await(timeout, TimeUnit.MILLISECONDS);
+        while (!isTimeout() && response == null) {
+            try {
+                latch.await(timeout, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                log.warn("rpc thread is interrupted,requestId:{}", requestId);
             }
-            futureMap.remove(requestId);
-            return response;
-        } catch (InterruptedException e) {
-            return response;
-        } finally {
-            lock.unlock();
         }
+        futureMap.remove(requestId);
+        if (response == null) {
+            throw new RpcException("time out");
+        }
+        return response;
     }
 
     private boolean isTimeout() {

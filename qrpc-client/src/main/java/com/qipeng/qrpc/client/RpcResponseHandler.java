@@ -19,7 +19,7 @@ public class RpcResponseHandler extends SimpleChannelInboundHandler<RpcResponse>
         RpcFuture rpcFuture = RpcFuture.futureMap.get(rpcResponse.getRequestId());
         if (rpcFuture != null) {
             rpcFuture.setResponse(rpcResponse);
-            rpcFuture.getCondition().signal();
+            rpcFuture.getLatch().countDown();
         }
     }
 }

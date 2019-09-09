@@ -4,7 +4,7 @@ package com.qipeng.qrpc.test.server.config;/**
  **/
 
 import com.qipeng.qprc.server.spring.RpcServiceAnnotationPostProcessor;
-import com.qipeng.qprc.server.spring.ServerStarter;
+import com.qipeng.qprc.server.spring.RpcServerStarter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,7 +21,7 @@ public class BeanConfig {
     }
 
     @Bean
-    public ServerStarter buildServerStarter() {
-        return new ServerStarter();
+    public RpcServerStarter buildServerStarter() {
+        return new RpcServerStarter();
     }
 }
