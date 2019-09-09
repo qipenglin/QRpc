@@ -1,8 +1,8 @@
-package com.qipeng.qprc.server.spring;
+package com.qipeng.qrpc.server.spring;
 
-import com.qipeng.qprc.server.RpcServer;
-import com.qipeng.qprc.server.RpcServerFactory;
-import com.qipeng.qprc.server.ServiceProvider;
+import com.qipeng.qrpc.server.RpcServer;
+import com.qipeng.qrpc.server.RpcServerFactory;
+import com.qipeng.qrpc.server.ServiceProvider;
 import com.qipeng.qrpc.common.ServerParam;
 import com.qipeng.qrpc.common.registry.Registry;
 import com.qipeng.qrpc.common.registry.RegistryFactory;

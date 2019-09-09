@@ -3,7 +3,7 @@ package com.qipeng.qrpc.test.server.service;/**
  * @Date 2019-09-05 17:35
  **/
 
-import com.qipeng.qprc.server.annotation.RpcService;
+import com.qipeng.qrpc.server.annotation.RpcService;
 import com.qipeng.qrpc.test.api.TestRequest;
 import com.qipeng.qrpc.test.api.TestResponse;
 import com.qipeng.qrpc.test.api.TestService;

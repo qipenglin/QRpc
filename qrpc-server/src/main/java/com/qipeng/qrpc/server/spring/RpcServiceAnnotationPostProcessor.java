@@ -1,8 +1,8 @@
-package com.qipeng.qprc.server.spring;
+package com.qipeng.qrpc.server.spring;
 
-import com.qipeng.qprc.server.RpcServer;
-import com.qipeng.qprc.server.ServiceProvider;
-import com.qipeng.qprc.server.annotation.RpcService;
+import com.qipeng.qrpc.server.RpcServer;
+import com.qipeng.qrpc.server.ServiceProvider;
+import com.qipeng.qrpc.server.annotation.RpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;

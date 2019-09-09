@@ -1,4 +1,4 @@
-package com.qipeng.qprc.server;
+package com.qipeng.qrpc.server;
 
 import com.qipeng.qrpc.common.PacketCodecHandler;
 import com.qipeng.qrpc.common.ServerParam;

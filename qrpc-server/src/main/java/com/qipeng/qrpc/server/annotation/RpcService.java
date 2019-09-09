@@ -1,4 +1,4 @@
-package com.qipeng.qprc.server.annotation;
+package com.qipeng.qrpc.server.annotation;
 
 import org.springframework.stereotype.Component;
 
