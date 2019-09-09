@@ -8,8 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @Date 2019-09-05 17:06
  **/
 @SpringBootApplication(scanBasePackages="com.qipeng.qrpc")
-public class Application {
+public class RpcServerApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(RpcServerApplication.class, args);
     }
 }

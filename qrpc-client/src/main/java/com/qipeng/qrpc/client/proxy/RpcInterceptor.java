@@ -14,7 +14,7 @@ public class RpcInterceptor implements MethodInterceptor {
     public Object intercept(Object o, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         InvocationContext context = new InvocationContext();
         InvokerParam invokerParam = new InvokerParam();
-        invokerParam.setClazz(o.getClass());
+        invokerParam.setClazz(method.getDeclaringClass());
         invokerParam.setMethodName(method.getName());
         context.setInvokerParam(invokerParam);
         context.setParamTypes(method.getParameterTypes());

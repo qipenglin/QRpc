@@ -2,8 +2,19 @@ package com.qipeng.qrpc.common;
 
 import lombok.Data;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Data
 public class RpcRequest extends RpcPacket {
+
+    private Integer requestId;
+
+    private static AtomicInteger requestIdSeed = new AtomicInteger(0);
+
+    public RpcRequest() {
+        super();
+        setRequestId(requestIdSeed.addAndGet(1));
+    }
 
     /**
      * 接口类

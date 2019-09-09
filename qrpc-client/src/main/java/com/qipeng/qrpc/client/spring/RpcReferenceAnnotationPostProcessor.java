@@ -30,18 +30,18 @@ public class RpcReferenceAnnotationPostProcessor implements BeanPostProcessor, B
     @Override
     public Object postProcessAfterInitialization(Object bean, String s) throws BeansException {
         Class clazz = bean.getClass();
-        Field[] fields = clazz.getFields();
+        Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
             if (field.isAnnotationPresent(RpcReference.class)) {
                 try {
-                    Object proxy = ProxyFactory.getProxy(field.getClass());
+                    Object proxy = ProxyFactory.getProxy(field.getType());
                     field.set(bean, proxy);
                 } catch (IllegalAccessException e) {
                     log.error("处理RpcReference注解失败,类名:{},字段:{}", clazz.getName(), field.getName());
                 }
             }
         }
-        return null;
+        return bean;
     }
 }

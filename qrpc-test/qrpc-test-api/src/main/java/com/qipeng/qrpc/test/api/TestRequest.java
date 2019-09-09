@@ -5,11 +5,13 @@ package com.qipeng.qrpc.test.api;/**
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @Author qipenglin
  * @Date 2019-09-05 16:36
  **/
 @Data
-public class TestRequest {
+public class TestRequest implements Serializable {
     private String name;
 }

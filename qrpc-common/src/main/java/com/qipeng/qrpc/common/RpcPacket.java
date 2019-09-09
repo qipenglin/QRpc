@@ -2,10 +2,10 @@ package com.qipeng.qrpc.common;
 
 import lombok.Data;
 
-@Data
-public abstract class RpcPacket {
+import java.io.Serializable;
 
-    private Integer requestId;
+@Data
+public abstract class RpcPacket implements Serializable {
 
     private Byte serializerType;
 

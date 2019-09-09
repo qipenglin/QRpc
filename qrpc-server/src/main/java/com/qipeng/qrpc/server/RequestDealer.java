@@ -22,14 +22,14 @@ public class RequestDealer {
 
     private static ThreadPoolExecutor executor;
 
-    public RequestDealer() {
+    static  {
         ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("requestDealer-{}").build();
         executor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10000), threadFactory);
     }
 
 
-    public static void dealRequest(Channel channel, RpcRequest request, ServiceProvider provider) {
+    static void dealRequest(Channel channel, RpcRequest request, ServiceProvider provider) {
         executor.submit(() -> {
             RpcResponse response = new RpcResponse();
             response.setRequestId(request.getRequestId());

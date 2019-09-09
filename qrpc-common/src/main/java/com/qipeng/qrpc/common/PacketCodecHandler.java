@@ -1,7 +1,9 @@
 package com.qipeng.qrpc.common;
 
+import com.qipeng.qrpc.common.serializer.Serializer;
 import com.qipeng.qrpc.common.serializer.SerializerFactory;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 
@@ -9,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@ChannelHandler.Sharable
 public class PacketCodecHandler extends MessageToMessageCodec<ByteBuf, RpcPacket> {
     public static final PacketCodecHandler INSTANCE = new PacketCodecHandler();
 
@@ -44,9 +47,10 @@ public class PacketCodecHandler extends MessageToMessageCodec<ByteBuf, RpcPacket
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcPacket packet, List<Object> out) throws Exception {
         ByteBuf byteBuf = ctx.channel().alloc().ioBuffer();
-        byte[] bytes = SerializerFactory.getSerializer().serialize(packet);
+        Serializer serializer = SerializerFactory.getSerializer();
+        byte[] bytes = serializer.serialize(packet);
         byteBuf.writeInt(MAGIC_NUM);
-        byteBuf.writeByte(packet.getSerializerType());
+        byteBuf.writeByte(serializer.getSerializerAlgorithm());
         byteBuf.writeByte(packet.getPacketType());
         byteBuf.writeInt(bytes.length);
         byteBuf.writeBytes(bytes);

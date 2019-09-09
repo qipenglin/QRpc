@@ -5,6 +5,7 @@ package com.qipeng.qrpc.test.api;/**
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Date;
  * @Date 2019-09-05 16:36
  **/
 @Data
-public class TestResponse {
+public class TestResponse implements Serializable {
 
     private String name;
 
