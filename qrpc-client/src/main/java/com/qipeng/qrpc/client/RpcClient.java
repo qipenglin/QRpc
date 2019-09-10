@@ -13,8 +13,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,6 +51,8 @@ public class RpcClient {
                 pipeline.addLast(new RpcPacketSplitter());
                 pipeline.addLast(PacketCodecHandler.INSTANCE);
                 pipeline.addLast(RpcResponseHandler.INSTANCE);
+                pipeline.addLast(new IdleStateHandler(0, 4, 0));
+                pipeline.addLast(new HeartBeatClientHandler());
             }
         });
         ChannelFuture channelFuture = null;

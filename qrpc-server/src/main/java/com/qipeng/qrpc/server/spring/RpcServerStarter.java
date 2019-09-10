@@ -1,12 +1,12 @@
 package com.qipeng.qrpc.server.spring;
 
-import com.qipeng.qrpc.server.RpcServer;
-import com.qipeng.qrpc.server.RpcServerFactory;
-import com.qipeng.qrpc.server.ServiceProvider;
 import com.qipeng.qrpc.common.ServerParam;
 import com.qipeng.qrpc.common.registry.Registry;
 import com.qipeng.qrpc.common.registry.RegistryFactory;
 import com.qipeng.qrpc.common.util.NetUtil;
+import com.qipeng.qrpc.server.RpcServer;
+import com.qipeng.qrpc.server.RpcServerFactory;
+import com.qipeng.qrpc.server.ServiceProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -24,6 +24,10 @@ public class RpcServerStarter implements ApplicationListener<ContextRefreshedEve
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent applicationEvent) {
+        //防止重读
+        if (applicationEvent.getApplicationContext().getParent() != null) {
+            return;
+        }
         startRpcServer();
     }
 

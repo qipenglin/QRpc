@@ -13,6 +13,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -56,6 +57,8 @@ public class RpcServer {
                 pipeline.addLast(new RpcPacketSplitter());
                 pipeline.addLast(PacketCodecHandler.INSTANCE);
                 pipeline.addLast(RpcRequestHandler.INSTANCE);
+                pipeline.addLast(new IdleStateHandler(5, 0, 0));
+                pipeline.addLast(new HeartBeatServerHandler());
             }
         });
         // 当服务器请求处理线程全满时，用于临时存放已完成三次握手的请求的队列的最大长度
