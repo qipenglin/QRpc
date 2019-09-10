@@ -13,10 +13,9 @@ public class HelloServiceImpl implements HelloService {
     private TestService testService;
 
     @Override
-    public void sayHello() {
+    public TestResponse sayHello() {
         TestRequest request = new TestRequest();
         request.setName("QiPeng");
-        TestResponse response = testService.test(request);
-        System.out.println(response.getDate());
+        return testService.test(request);
     }
 }

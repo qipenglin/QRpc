@@ -25,7 +25,7 @@ public class HeartBeatServerHandler extends SimpleChannelInboundHandler<RpcHeart
     private Map<Channel, AtomicInteger> lossMap = new HashMap<>();
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RpcHeartBeat msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, RpcHeartBeat msg) {
         log.info("Receive RpcHeartBeat from :{}", ctx.channel().localAddress().toString());
     }
 

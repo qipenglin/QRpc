@@ -21,11 +21,12 @@ public class PacketCodecHandler extends MessageToMessageCodec<ByteBuf, RpcPacket
 
     private static final int MAGIC_NUM = 0x12345678;
 
-
     private static Map<Byte, Class<? extends RpcPacket>> packetTypeMap = new HashMap<>();
+
     static {
-        packetTypeMap.put(RpcPacket.PacketType.REQUEST,RpcRequest.class);
-        packetTypeMap.put(RpcPacket.PacketType.RESPONSE,RpcResponse.class);
+        packetTypeMap.put(RpcPacket.PacketType.HEART_BEAT, RpcHeartBeat.class);
+        packetTypeMap.put(RpcPacket.PacketType.REQUEST, RpcRequest.class);
+        packetTypeMap.put(RpcPacket.PacketType.RESPONSE, RpcResponse.class);
     }
 
     @Override
