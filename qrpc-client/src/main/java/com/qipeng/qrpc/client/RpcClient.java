@@ -11,6 +11,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -22,12 +23,12 @@ import java.net.InetSocketAddress;
 @Slf4j
 public class RpcClient {
 
+    private static EventLoopGroup workerGroup = new NioEventLoopGroup();
+
     private Channel channel;
 
     @Getter
     private ServerParam serverInfo;
-
-    private boolean isActive;
 
     public RpcResponse invokeRpc(RpcRequest request) {
         channel.writeAndFlush(request);
@@ -35,11 +36,12 @@ public class RpcClient {
         return rpcFuture.get();
     }
 
-    public void activate(EventLoopGroup workerGroup, final ServerParam serverInfo) {
-        if (isActive) {
-            return;
-        }
+    RpcClient(ServerParam serverInfo) {
         this.serverInfo = serverInfo;
+        doConnect(serverInfo);
+    }
+
+    private void doConnect(ServerParam serverInfo) {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerGroup);
         bootstrap.channel(NioSocketChannel.class);
@@ -59,12 +61,11 @@ public class RpcClient {
         try {
             channelFuture = bootstrap.connect(new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort())).sync();
         } catch (InterruptedException e) {
-            log.error("启动netty客户端失败，serverParam: {}", serverInfo, e);
+            log.error("netty客户端连接服务器失败，serverParam: {}", serverInfo, e);
         }
         if (channelFuture != null) {
             channelFuture.addListener(f -> log.info("启动netty客户端成功，serverInfo: {}", serverInfo));
             channel = channelFuture.channel();
-            isActive = true;
         }
     }
 }

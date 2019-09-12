@@ -4,13 +4,15 @@ import com.qipeng.qrpc.common.InvokerParam;
 import com.qipeng.qrpc.common.ServerParam;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class InvocationContext {
 
     /**
-     * 调用参数
+     * 可供选择的服务器列表
      */
-    private InvokerParam invokerParam;
+    private List<ServerParam> serverParams;
 
     /**
      * 最终选择的服务提供者地址
@@ -18,13 +20,9 @@ public class InvocationContext {
     private ServerParam serverParam;
 
     /**
-     * 调用方法的参数类型列表
+     * 调用参数
      */
-    private Class<?>[] paramTypes;
+    private InvokerParam invokerParam;
 
-    /**
-     * 调用方法的参数
-     */
-    private Object[] parameters;
 
 }

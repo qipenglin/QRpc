@@ -4,7 +4,7 @@ import com.qipeng.qrpc.common.RpcConfig;
 
 public class RegistryFactory {
 
-    public static Registry getRegistry() {
+    public static Registry getRegistryFromConfig() {
         switch (RpcConfig.REGISTRY_PROTOCOL) {
             case RegistryProtocol.REDIS:
                 return RedisRegistry.getInstance();

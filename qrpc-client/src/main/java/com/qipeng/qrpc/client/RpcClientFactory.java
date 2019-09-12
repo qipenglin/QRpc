@@ -1,8 +1,8 @@
 package com.qipeng.qrpc.client;
 
+import com.qipeng.qrpc.client.proxy.ProxyFactory;
 import com.qipeng.qrpc.common.ServerParam;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import com.qipeng.qrpc.common.registry.Registry;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,9 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RpcClientFactory {
 
-    private static EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-    private static ConcurrentHashMap<ServerParam, RpcClient> clientMap = new ConcurrentHashMap<ServerParam, RpcClient>();
+    private static ConcurrentHashMap<ServerParam, RpcClient> clientMap = new ConcurrentHashMap<>();
 
     public static RpcClient getClient(ServerParam serverParam) {
         RpcClient client = clientMap.get(serverParam);
@@ -22,13 +20,14 @@ public class RpcClientFactory {
         }
         synchronized (RpcClientFactory.class) {
             if (clientMap.get(serverParam) == null) {
-                client = new RpcClient();
-                client.activate(workerGroup, serverParam);
+                client = new RpcClient(serverParam);
                 clientMap.put(serverParam, client);
                 return client;
             }
         }
         return clientMap.get(serverParam);
     }
+
+
 
 }
