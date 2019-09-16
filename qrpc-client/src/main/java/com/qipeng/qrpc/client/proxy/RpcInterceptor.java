@@ -9,6 +9,7 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class RpcInterceptor implements MethodInterceptor {
 
@@ -23,6 +24,7 @@ public class RpcInterceptor implements MethodInterceptor {
     RpcInterceptor(ServerParam serverParam) {
         this.serverParam = serverParam;
     }
+
     @Override
     public Object intercept(Object o, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         InvocationContext context = new InvocationContext();
@@ -33,6 +35,8 @@ public class RpcInterceptor implements MethodInterceptor {
         invokerParam.setParameters(args);
 
         context.setInvokerParam(invokerParam);
+        List<ServerParam> serverParams = registry.getServerParam(method.getDeclaringClass().getName());
+        context.setServerParams(serverParams);
         return InvocationHandlerChain.invoke(context);
     }
 }
