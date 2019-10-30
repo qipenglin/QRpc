@@ -21,7 +21,7 @@
     </modules>
     <properties>
         <qrpc.version>1.0-SNAPSHOT</qrpc.version>
-        <netty.version>4.1.39.Final</netty.version>
+        <netty.version>4.1.42.Final</netty.version>
         <lombok.version>1.16.12</lombok.version>
         <curator.version>4.2.0</curator.version>
         <zk.version>3.4.11</zk.version>
