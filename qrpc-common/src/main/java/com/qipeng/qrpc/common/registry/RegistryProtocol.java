@@ -1,8 +1,22 @@
 package com.qipeng.qrpc.common.registry;
 
-public interface RegistryProtocol {
+public enum RegistryProtocol {
 
-    String ZOOKEEPER = "zookeeper";
+    ZOOKEEPER("zookeeper"),
+    REDIS("redis");
 
-    String REDIS = "redis";
+    private String protocol;
+
+    RegistryProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    RegistryProtocol forName(String protocol) {
+        for (RegistryProtocol value : values()) {
+            if (value.protocol.equals(protocol)) {
+                return value;
+            }
+        }
+        return null;
+    }
 }

@@ -28,13 +28,12 @@ public class RpcInterceptor implements MethodInterceptor {
     @Override
     public Object intercept(Object o, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         InvocationContext context = new InvocationContext();
-        InvokerParam invokerParam = new InvokerParam();
-        invokerParam.setClazz(method.getDeclaringClass());
-        invokerParam.setMethodName(method.getName());
-        invokerParam.setParamTypes(method.getParameterTypes());
-        invokerParam.setParameters(args);
-
-        context.setInvokerParam(invokerParam);
+        InvokerParam invokeParam = new InvokerParam();
+        invokeParam.setClazz(method.getDeclaringClass());
+        invokeParam.setMethodName(method.getName());
+        invokeParam.setParamTypes(method.getParameterTypes());
+        invokeParam.setParameters(args);
+        context.setInvokeParam(invokeParam);
         List<ServerParam> serverParams = registry.getServerParam(method.getDeclaringClass().getName());
         context.setServerParams(serverParams);
         return InvocationHandlerChain.invoke(context);

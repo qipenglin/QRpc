@@ -36,7 +36,6 @@ public class RpcServer {
     private volatile boolean isActivated;
 
     public void start(ServerParam serverParam) {
-        // spring初始化bean时仅会在同一个线程中初始化，故无需考虑多个AirServer同时被调用active方法
         if (isActivated) {
             return;
         }

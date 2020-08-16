@@ -1,7 +1,9 @@
-package com.qipeng.qrpc.common.serializer;
+package com.qipeng.qrpc.common.serializer.impl;
 
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
+import com.qipeng.qrpc.common.serializer.Serializer;
+import com.qipeng.qrpc.common.serializer.SerializerProtocol;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
@@ -30,7 +32,7 @@ public class HessianSerializer implements Serializer {
 
     @Override
     public Byte getSerializerAlgorithm() {
-        return SerializerAlgorithm.HESSIAN.getCode();
+        return SerializerProtocol.HESSIAN.getCode();
     }
 
     @Override
@@ -39,22 +41,20 @@ public class HessianSerializer implements Serializer {
         HessianOutput hessianOutput = new HessianOutput(outputStream);
         try {
             hessianOutput.writeObject(object);
+            return outputStream.toByteArray();
         } catch (IOException e) {
-            log.error(String.valueOf(e));
+            throw new RuntimeException(e);
         }
-        return outputStream.toByteArray();
     }
 
     @Override
     public <T> T deserialize(Class<T> clazz, byte[] bytes) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
         HessianInput hessianInput = new HessianInput(inputStream);
-        T o = null;
         try {
-            o = (T) hessianInput.readObject();
-        } catch (IOException e) {
-            log.error(String.valueOf(e));
+            return (T) hessianInput.readObject();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return o;
     }
 }

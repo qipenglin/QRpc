@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RpcConfig {
 
+    public static String REGISTRY_URI;
+
     public static String REGISTRY_PROTOCOL;
 
     public static String REGISTRY_ADDRESS;
@@ -16,6 +18,11 @@ public class RpcConfig {
     public static String PROTOCOL_NAME;
 
     public static String PROTOCOL_PORT;
+
+    @Value("${qrpc.registry}")
+    public void setRegistryUri(String registryUri) {
+        REGISTRY_URI = registryUri;
+    }
 
     @Value("${qrpc.registry.protocol}")
     public void setRegistryProtocol(String registryProtocol) {

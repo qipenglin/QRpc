@@ -1,6 +1,8 @@
 package com.qipeng.qrpc.common.registry;
 
 import com.qipeng.qrpc.common.RpcConfig;
+import com.qipeng.qrpc.common.registry.impl.RedisRegistry;
+import com.qipeng.qrpc.common.registry.impl.ZookeeperRegistry;
 
 public class RegistryFactory {
 
@@ -12,6 +14,10 @@ public class RegistryFactory {
             default:
                 return ZookeeperRegistry.getInstance();
         }
+    }
+
+    public static RegistryConfig getDefaultConfig() {
+
     }
 
 }

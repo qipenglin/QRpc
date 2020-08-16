@@ -11,12 +11,12 @@ public class ProxyFactory {
 
     private static final Map<Registry, Map<String, Object>> REGISTRY_PROXY_MAP = new ConcurrentHashMap<>();
 
-    public static Object getProxy(Class clazz) {
+    public static Object getProxy(Class<?> clazz) {
         Registry registry = RegistryFactory.getRegistryFromConfig();
         return getProxy(clazz, registry);
     }
 
-    public static Object getProxy(Class clazz, Registry registry) {
+    public static Object getProxy(Class<?> clazz, Registry registry) {
         Map<String, Object> proxyMap;
         if ((proxyMap = REGISTRY_PROXY_MAP.get(registry)) != null) {
             return getProxy(clazz, registry, proxyMap);
@@ -27,7 +27,7 @@ public class ProxyFactory {
         return getProxy(clazz, registry, proxyMap);
     }
 
-    private static Object getProxy(Class clazz, Registry registry, Map<String, Object> proxyMap) {
+    private static Object getProxy(Class<?> clazz, Registry registry, Map<String, Object> proxyMap) {
         String className = clazz.getName();
         Object proxy = proxyMap.get(className);
         if (proxy != null) {
@@ -35,14 +35,17 @@ public class ProxyFactory {
         }
         synchronized (clazz) {
             if (proxyMap.get(className) == null) {
-                Enhancer enhancer = new Enhancer();
-                enhancer.setSuperclass(clazz);
-                enhancer.setCallback(new RpcInterceptor(registry));
-                proxy = enhancer.create();
+                proxy = doCreateProxy(clazz, registry);
                 proxyMap.put(clazz.getName(), proxy);
-                return proxy;
             }
         }
         return proxyMap.get(className);
+    }
+
+    private static Object doCreateProxy(Class<?> clazz, Registry registry) {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(clazz);
+        enhancer.setCallback(new RpcInterceptor(registry));
+        return enhancer.create();
     }
 }

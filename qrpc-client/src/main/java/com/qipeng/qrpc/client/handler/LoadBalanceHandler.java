@@ -8,10 +8,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class LoadBalanceHandler extends AbstractInvocationHandler {
 
     @Override
-    public Object invoke(InvocationContext context) {
+    public Object doInvoke(InvocationContext context) {
         ServerParam serverParam = loadBalance(context.getServerParams());
         context.setServerParam(serverParam);
-        return getNext().invoke(context);
+        return null;
     }
 
     private ServerParam loadBalance(List<ServerParam> serverParams) {

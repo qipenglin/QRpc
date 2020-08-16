@@ -19,7 +19,7 @@ public class RpcRequest extends RpcPacket {
     /**
      * 接口类
      */
-    private Class clazz;
+    private Class<?> clazz;
 
     /**
      * 调用方法名称

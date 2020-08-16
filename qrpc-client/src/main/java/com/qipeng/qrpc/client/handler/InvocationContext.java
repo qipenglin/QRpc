@@ -22,7 +22,7 @@ public class InvocationContext {
     /**
      * 调用参数
      */
-    private InvokerParam invokerParam;
+    private InvokerParam invokeParam;
 
 
 }

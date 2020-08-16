@@ -1,7 +1,8 @@
-package com.qipeng.qrpc.common.registry;
+package com.qipeng.qrpc.common.registry.impl;
 
 import com.qipeng.qrpc.common.RpcConfig;
 import com.qipeng.qrpc.common.ServerParam;
+import com.qipeng.qrpc.common.registry.Registry;
 import com.qipeng.qrpc.common.util.ZookeeperClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -14,10 +15,8 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -29,11 +28,9 @@ public class ZookeeperRegistry implements Registry {
 
     private static final String CONSUMERS = "consumers";
 
-    private ZookeeperClient zkClient;
+    private final ZookeeperClient zkClient;
 
-    private Map<String, List<ServerParam>> serviceMap = new ConcurrentHashMap<>();
-
-    private Set<String> servicesListened = new HashSet<>();
+    private final Map<String, List<ServerParam>> serviceMap = new ConcurrentHashMap<>();
 
     private volatile static ZookeeperRegistry instance;
 
@@ -50,13 +47,8 @@ public class ZookeeperRegistry implements Registry {
     }
 
     private ZookeeperRegistry() {
-        String zkAddress = RpcConfig.REGISTRY_ADDRESS;
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
-        zkClient = new ZookeeperClient(CuratorFrameworkFactory.newClient(zkAddress, retryPolicy));
-    }
-
-    private String getZookeeperRegistry() {
-        return "";
+        zkClient = new ZookeeperClient(CuratorFrameworkFactory.newClient(RpcConfig.REGISTRY_ADDRESS, retryPolicy));
     }
 
     @Override

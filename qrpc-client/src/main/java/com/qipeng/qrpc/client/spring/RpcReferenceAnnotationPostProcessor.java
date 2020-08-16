@@ -29,7 +29,7 @@ public class RpcReferenceAnnotationPostProcessor implements BeanPostProcessor, B
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String s) throws BeansException {
-        Class clazz = bean.getClass();
+        Class<?> clazz = bean.getClass();
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
