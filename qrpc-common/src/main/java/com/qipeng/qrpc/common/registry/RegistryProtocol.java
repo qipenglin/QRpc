@@ -11,7 +11,7 @@ public enum RegistryProtocol {
         this.protocol = protocol;
     }
 
-    RegistryProtocol forName(String protocol) {
+    public static RegistryProtocol forName(String protocol) {
         for (RegistryProtocol value : values()) {
             if (value.protocol.equals(protocol)) {
                 return value;

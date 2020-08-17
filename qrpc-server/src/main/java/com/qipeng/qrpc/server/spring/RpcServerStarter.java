@@ -44,7 +44,7 @@ public class RpcServerStarter implements ApplicationListener<ContextRefreshedEve
     }
 
     private void registerService(Collection<ServiceProvider> providers, ServerParam serverParam) {
-        Registry registry = RegistryFactory.getRegistryFromConfig();
+        Registry registry = RegistryFactory.getDefaultRegistry();
         for (ServiceProvider provider : providers) {
             registry.registerService(provider.getServiceName(), serverParam);
         }

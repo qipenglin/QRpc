@@ -12,7 +12,7 @@ public class ProxyFactory {
     private static final Map<Registry, Map<String, Object>> REGISTRY_PROXY_MAP = new ConcurrentHashMap<>();
 
     public static Object getProxy(Class<?> clazz) {
-        Registry registry = RegistryFactory.getRegistryFromConfig();
+        Registry registry = RegistryFactory.getDefaultRegistry();
         return getProxy(clazz, registry);
     }
 
