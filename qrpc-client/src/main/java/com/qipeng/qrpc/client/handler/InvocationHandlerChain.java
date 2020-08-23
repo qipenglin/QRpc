@@ -8,6 +8,7 @@ public class InvocationHandlerChain {
     private static final List<InvocationHandler> handlerList = new ArrayList<>();
 
     static {
+        handlerList.add(new MonitorHandler());
         handlerList.add(new ServiceDiscoveryHandler());
         handlerList.add(new LoadBalanceHandler());
         handlerList.add(new RpcInvokeHandler());

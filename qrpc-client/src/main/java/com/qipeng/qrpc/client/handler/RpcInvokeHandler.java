@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.client.handler;
 
-import com.qipeng.qrpc.client.RpcClient;
+import com.qipeng.qrpc.client.NettyRpcClient;
 import com.qipeng.qrpc.client.RpcClientFactory;
 import com.qipeng.qrpc.common.RpcRequest;
 import com.qipeng.qrpc.common.RpcResponse;
@@ -11,8 +11,8 @@ public class RpcInvokeHandler extends AbstractInvocationHandler {
     @Override
     public void doInvoke(InvocationContext context) {
         RpcRequest request = buildRpcRequest(context);
-        RpcClient rpcClient = RpcClientFactory.getClient(context.getServerParam());
-        RpcResponse response = rpcClient.invokeRpc(request);
+        NettyRpcClient nettyRpcClient = RpcClientFactory.getClient(context.getServerInfo());
+        RpcResponse response = nettyRpcClient.invokeRpc(request);
         if (response.getHasException()) {
             throw new RpcException((Throwable) response.getResult());
         }

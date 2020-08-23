@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.client.handler;
 
-import com.qipeng.qrpc.common.ServerParam;
+import com.qipeng.qrpc.common.ServerInfo;
 import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.registry.Registry;
 import org.apache.commons.collections4.CollectionUtils;
@@ -16,10 +16,10 @@ public class ServiceDiscoveryHandler extends AbstractInvocationHandler {
     void doInvoke(InvocationContext context) {
         Registry registry = context.getRegistry();
         String serviceName = context.getInvokeParam().getClazz().getName();
-        List<ServerParam> serverParams = registry.getServerParam(serviceName);
-        if (CollectionUtils.isEmpty(serverParams)) {
+        List<ServerInfo> serverInfos = registry.getServerParam(serviceName);
+        if (CollectionUtils.isEmpty(serverInfos)) {
             throw new RpcException("Service" + serviceName + " Not Found");
         }
-        context.setServerParams(serverParams);
+        context.setServerInfos(serverInfos);
     }
 }

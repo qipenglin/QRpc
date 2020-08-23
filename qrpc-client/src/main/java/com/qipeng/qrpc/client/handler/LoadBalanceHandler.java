@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.client.handler;
 
-import com.qipeng.qrpc.common.ServerParam;
+import com.qipeng.qrpc.common.ServerInfo;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -12,15 +12,15 @@ public class LoadBalanceHandler extends AbstractInvocationHandler {
 
     @Override
     public void doInvoke(InvocationContext context) {
-        ServerParam serverParam = loadBalance(context.getServerParams());
-        context.setServerParam(serverParam);
+        ServerInfo serverInfo = loadBalance(context.getServerInfos());
+        context.setServerInfo(serverInfo);
     }
 
-    private ServerParam loadBalance(List<ServerParam> serverParams) {
-        if (serverParams.size() == 1) {
-            return serverParams.get(0);
+    private ServerInfo loadBalance(List<ServerInfo> serverInfos) {
+        if (serverInfos.size() == 1) {
+            return serverInfos.get(0);
         }
-        int index = ThreadLocalRandom.current().nextInt(serverParams.size());
-        return serverParams.get(index);
+        int index = ThreadLocalRandom.current().nextInt(serverInfos.size());
+        return serverInfos.get(index);
     }
 }

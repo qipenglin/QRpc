@@ -1,7 +1,7 @@
 package com.qipeng.qrpc.common.registry.impl;
 
 import com.qipeng.qrpc.common.RpcConfig;
-import com.qipeng.qrpc.common.ServerParam;
+import com.qipeng.qrpc.common.ServerInfo;
 import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.registry.AbstractRegistry;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
@@ -49,7 +49,7 @@ public class RedisRegistry extends AbstractRegistry {
     }
 
     @Override
-    public List<ServerParam> doGetServerParam(String serviceName) {
+    public List<ServerInfo> doGetServerParam(String serviceName) {
         Set<String> servers;
         try (Jedis jedis = jedisPool.getResource()) {
             servers = jedis.smembers("/qrpc/" + serviceName);
@@ -59,7 +59,7 @@ public class RedisRegistry extends AbstractRegistry {
         }
         return servers.stream()
                 .map(s -> s.split(":"))
-                .map(s -> new ServerParam(s[0], Integer.parseInt(s[1])))
+                .map(s -> new ServerInfo(s[0], Integer.parseInt(s[1])))
                 .collect(Collectors.toList());
     }
 
@@ -68,9 +68,9 @@ public class RedisRegistry extends AbstractRegistry {
     }
 
     @Override
-    public boolean registerService(String serviceName, ServerParam serverParam) {
+    public boolean registerService(String serviceName, ServerInfo serverInfo) {
         try (Jedis jedis = jedisPool.getResource()) {
-            jedis.sadd("/qrpc/" + serviceName, serverParam.getHost() + ":" + serverParam.getPort());
+            jedis.sadd("/qrpc/" + serviceName, serverInfo.getHost() + ":" + serverInfo.getPort());
             return true;
         } catch (Exception e) {
             return false;

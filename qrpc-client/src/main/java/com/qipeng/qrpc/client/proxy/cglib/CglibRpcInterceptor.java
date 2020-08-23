@@ -1,4 +1,4 @@
-package com.qipeng.qrpc.client.proxy;
+package com.qipeng.qrpc.client.proxy.cglib;
 
 import com.qipeng.qrpc.client.handler.InvocationContext;
 import com.qipeng.qrpc.client.handler.InvocationHandlerChain;
@@ -9,11 +9,11 @@ import org.springframework.cglib.proxy.MethodProxy;
 
 import java.lang.reflect.Method;
 
-public class RpcInterceptor implements MethodInterceptor {
+public class CglibRpcInterceptor implements MethodInterceptor {
 
     private final Registry registry;
 
-    RpcInterceptor(Registry registry) {
+    public CglibRpcInterceptor(Registry registry) {
         this.registry = registry;
     }
 

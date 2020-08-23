@@ -1,7 +1,7 @@
 package com.qipeng.qrpc.client.handler;
 
 import com.qipeng.qrpc.common.InvokerParam;
-import com.qipeng.qrpc.common.ServerParam;
+import com.qipeng.qrpc.common.ServerInfo;
 import com.qipeng.qrpc.common.registry.Registry;
 import lombok.Data;
 
@@ -17,12 +17,12 @@ public class InvocationContext {
     /**
      * 可供选择的服务器列表
      */
-    private List<ServerParam> serverParams;
+    private List<ServerInfo> serverInfos;
 
     /**
      * 最终选择的服务提供者地址
      */
-    private ServerParam serverParam;
+    private ServerInfo serverInfo;
 
     /**
      * 调用参数

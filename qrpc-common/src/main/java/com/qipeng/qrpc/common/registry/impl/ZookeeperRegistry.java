@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.common.registry.impl;
 
-import com.qipeng.qrpc.common.ServerParam;
+import com.qipeng.qrpc.common.ServerInfo;
 import com.qipeng.qrpc.common.registry.AbstractRegistry;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
 import com.qipeng.qrpc.common.util.ZookeeperClient;
@@ -27,7 +27,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
 
     private final static Map<RegistryConfig, ZookeeperRegistry> registryMap = new HashMap<>();
 
-    private final Map<String, List<ServerParam>> serviceMap = new ConcurrentHashMap<>();
+    private final Map<String, List<ServerInfo>> serviceMap = new ConcurrentHashMap<>();
 
     public static ZookeeperRegistry getInstance(RegistryConfig config) {
         ZookeeperRegistry registry = registryMap.get(config);
@@ -52,10 +52,10 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
     @Override
-    public List<ServerParam> doGetServerParam(String serviceName) {
-        List<ServerParam> serverParams = serviceMap.get(serviceName);
-        if (serverParams != null) {
-            return serverParams;
+    public List<ServerInfo> doGetServerParam(String serviceName) {
+        List<ServerInfo> serverInfos = serviceMap.get(serviceName);
+        if (serverInfos != null) {
+            return serverInfos;
         }
         try {
             String providerPath = buildProviderPath(serviceName);
@@ -78,9 +78,9 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
     @Override
-    public boolean registerService(String serviceName, ServerParam serverParam) {
+    public boolean registerService(String serviceName, ServerInfo serverInfo) {
         String providerPath = buildProviderPath(serviceName);
-        String serverAddr = serverParam.getHost() + ":" + serverParam.getPort();
+        String serverAddr = serverInfo.getHost() + ":" + serverInfo.getPort();
         if (!zkClient.checkExists(providerPath)) {
             zkClient.createPerNode(providerPath);
         }
@@ -95,18 +95,18 @@ public class ZookeeperRegistry extends AbstractRegistry {
         return ROOT + "/" + serviceName + "/" + PROVIDERS;
     }
 
-    private List<ServerParam> buildServerParams(List<String> serverAddrList) {
-        List<ServerParam> serverParams;
+    private List<ServerInfo> buildServerParams(List<String> serverAddrList) {
+        List<ServerInfo> serverInfos;
         if (CollectionUtils.isEmpty(serverAddrList)) {
             return Collections.emptyList();
         }
-        serverParams = new ArrayList<>(serverAddrList.size());
+        serverInfos = new ArrayList<>(serverAddrList.size());
         for (String provider : serverAddrList) {
             String[] serverAddr = provider.split(":");
-            ServerParam serverParam = new ServerParam(serverAddr[0], Integer.parseInt(serverAddr[1]));
-            serverParams.add(serverParam);
+            ServerInfo serverInfo = new ServerInfo(serverAddr[0], Integer.parseInt(serverAddr[1]));
+            serverInfos.add(serverInfo);
         }
-        return serverParams;
+        return serverInfos;
     }
 
     class ServiceListener implements PathChildrenCacheListener {
@@ -120,8 +120,8 @@ public class ZookeeperRegistry extends AbstractRegistry {
         public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
             String providerPath = buildProviderPath(serviceName);
             List<String> serverAddrList = zkClient.getChildren(providerPath);
-            List<ServerParam> serverParams = buildServerParams(serverAddrList);
-            serviceMap.put(serviceName, serverParams);
+            List<ServerInfo> serverInfos = buildServerParams(serverAddrList);
+            serviceMap.put(serviceName, serverInfos);
         }
     }
 }

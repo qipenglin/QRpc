@@ -1,7 +1,7 @@
 package com.qipeng.qrpc.server;
 
 import com.qipeng.qrpc.common.PacketCodecHandler;
-import com.qipeng.qrpc.common.ServerParam;
+import com.qipeng.qrpc.common.ServerInfo;
 import com.qipeng.qrpc.common.serializer.RpcPacketSplitter;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -35,11 +35,11 @@ public class RpcServer {
      */
     private volatile boolean isActivated;
 
-    public void start(ServerParam serverParam) {
+    public void start(ServerInfo serverInfo) {
         if (isActivated) {
             return;
         }
-        log.info("尝试启动server: {}", serverParam);
+        log.info("尝试启动server: {}", serverInfo);
 
         boss = new NioEventLoopGroup();
         worker = new NioEventLoopGroup();
@@ -67,7 +67,7 @@ public class RpcServer {
         bootstrap.option(ChannelOption.TCP_NODELAY, true);
         // 绑定ip和端口，并启动netty
         try {
-            bootstrap.bind(serverParam.getHost(), serverParam.getPort()).sync()
+            bootstrap.bind(serverInfo.getHost(), serverInfo.getPort()).sync()
                     .addListener(new ChannelFutureListener() {
                         @Override
                         public void operationComplete(ChannelFuture future) throws Exception {
