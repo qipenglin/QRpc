@@ -9,14 +9,14 @@ import com.qipeng.qrpc.common.exception.RpcException;
 public class RpcInvokeHandler extends AbstractInvocationHandler {
 
     @Override
-    public Object doInvoke(InvocationContext context) {
+    public void doInvoke(InvocationContext context) {
         RpcRequest request = buildRpcRequest(context);
         RpcClient rpcClient = RpcClientFactory.getClient(context.getServerParam());
         RpcResponse response = rpcClient.invokeRpc(request);
         if (response.getHasException()) {
-            return new RpcException((Throwable) response.getResult());
+            throw new RpcException((Throwable) response.getResult());
         }
-        return response.getResult();
+        context.setResult(response.getResult());
     }
 
     private RpcRequest buildRpcRequest(InvocationContext context) {

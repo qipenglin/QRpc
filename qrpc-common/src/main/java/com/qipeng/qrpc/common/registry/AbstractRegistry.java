@@ -28,5 +28,5 @@ public abstract class AbstractRegistry implements Registry {
 
     protected abstract void subscribe(String serviceName);
 
-    abstract List<ServerParam> doGetServerParam(String serviceName);
+    public abstract List<ServerParam> doGetServerParam(String serviceName);
 }

@@ -18,14 +18,14 @@ public class RegistryFactory {
         return getRegistry(config);
     }
 
-    public static Registry getRegistry(RegistryConfig config) {
+    private static Registry getRegistry(RegistryConfig config) {
         switch (config.getProtocol()) {
             case REDIS:
-                return RedisRegistry.getInstance();
+                return RedisRegistry.getInstance(config);
             case ZOOKEEPER:
-                return ZookeeperRegistry.getInstance();
+                return ZookeeperRegistry.getInstance(config);
             default:
-                throw new RpcException();
+                throw new RpcException("暂不支持该注册中心协议");
         }
     }
 

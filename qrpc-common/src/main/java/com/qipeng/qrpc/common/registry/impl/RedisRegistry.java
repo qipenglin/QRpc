@@ -3,45 +3,53 @@ package com.qipeng.qrpc.common.registry.impl;
 import com.qipeng.qrpc.common.RpcConfig;
 import com.qipeng.qrpc.common.ServerParam;
 import com.qipeng.qrpc.common.exception.RpcException;
-import com.qipeng.qrpc.common.registry.Registry;
+import com.qipeng.qrpc.common.registry.AbstractRegistry;
+import com.qipeng.qrpc.common.registry.RegistryConfig;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RedisRegistry implements Registry {
-
-    private volatile static RedisRegistry instance;
+public class RedisRegistry extends AbstractRegistry {
 
     private JedisPool jedisPool;
 
-    private RedisRegistry() {
+    private static Map<RegistryConfig, RedisRegistry> registryMap = new HashMap<>();
+
+    public static RedisRegistry getInstance(RegistryConfig config) {
+        RedisRegistry registry = registryMap.get(config);
+        if (registry != null) {
+            return registry;
+        }
+        synchronized (RedisRegistry.class) {
+            registry = registryMap.get(config);
+            if (registry != null) {
+                return registry;
+            }
+            registry = new RedisRegistry(config);
+            registryMap.put(config, registry);
+            return registry;
+        }
+    }
+
+    private RedisRegistry(RegistryConfig config) {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(1000);
         poolConfig.setMaxIdle(32);
         poolConfig.setMaxWaitMillis(100 * 1000);
         poolConfig.setTestOnBorrow(true);
+        String address = config.getHost() + ":" + config.getPort();
         jedisPool = new JedisPool(poolConfig, URI.create(RpcConfig.REGISTRY_ADDRESS));
     }
 
-    public static RedisRegistry getInstance() {
-        if (instance != null) {
-            return instance;
-        }
-        synchronized (RedisRegistry.class) {
-            if (instance == null) {
-                instance = new RedisRegistry();
-            }
-            return instance;
-        }
-    }
-
     @Override
-    public List<ServerParam> getServerParam(String serviceName) {
+    public List<ServerParam> doGetServerParam(String serviceName) {
         Set<String> servers;
         try (Jedis jedis = jedisPool.getResource()) {
             servers = jedis.smembers("/qrpc/" + serviceName);
@@ -53,6 +61,10 @@ public class RedisRegistry implements Registry {
                 .map(s -> s.split(":"))
                 .map(s -> new ServerParam(s[0], Integer.parseInt(s[1])))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    protected void subscribe(String serviceName) {
     }
 
     @Override

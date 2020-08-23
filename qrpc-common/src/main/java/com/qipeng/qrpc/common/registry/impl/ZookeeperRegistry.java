@@ -1,8 +1,8 @@
 package com.qipeng.qrpc.common.registry.impl;
 
-import com.qipeng.qrpc.common.RpcConfig;
 import com.qipeng.qrpc.common.ServerParam;
-import com.qipeng.qrpc.common.registry.Registry;
+import com.qipeng.qrpc.common.registry.AbstractRegistry;
+import com.qipeng.qrpc.common.registry.RegistryConfig;
 import com.qipeng.qrpc.common.util.ZookeeperClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -13,46 +13,46 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public class ZookeeperRegistry implements Registry {
+public class ZookeeperRegistry extends AbstractRegistry {
 
     private static final String ROOT = "/qrpc";
 
     private static final String PROVIDERS = "providers";
 
-    private static final String CONSUMERS = "consumers";
-
     private final ZookeeperClient zkClient;
+
+    private final static Map<RegistryConfig, ZookeeperRegistry> registryMap = new HashMap<>();
 
     private final Map<String, List<ServerParam>> serviceMap = new ConcurrentHashMap<>();
 
-    private volatile static ZookeeperRegistry instance;
-
-    public static ZookeeperRegistry getInstance() {
-        if (instance != null) {
-            return instance;
+    public static ZookeeperRegistry getInstance(RegistryConfig config) {
+        ZookeeperRegistry registry = registryMap.get(config);
+        if (registry != null) {
+            return registry;
         }
         synchronized (ZookeeperRegistry.class) {
-            if (instance == null) {
-                instance = new ZookeeperRegistry();
+            registry = registryMap.get(config);
+            if (registry != null) {
+                return registry;
             }
-            return instance;
+            registry = new ZookeeperRegistry(config);
+            registryMap.put(config, registry);
+            return registry;
         }
     }
 
-    private ZookeeperRegistry() {
+    private ZookeeperRegistry(RegistryConfig config) {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
-        zkClient = new ZookeeperClient(CuratorFrameworkFactory.newClient(RpcConfig.REGISTRY_ADDRESS, retryPolicy));
+        String address = config.getHost() + ":" + config.getPort();
+        zkClient = new ZookeeperClient(CuratorFrameworkFactory.newClient(address, retryPolicy));
     }
 
     @Override
-    public List<ServerParam> getServerParam(String serviceName) {
+    public List<ServerParam> doGetServerParam(String serviceName) {
         List<ServerParam> serverParams = serviceMap.get(serviceName);
         if (serverParams != null) {
             return serverParams;
@@ -63,12 +63,18 @@ public class ZookeeperRegistry implements Registry {
                 return Collections.emptyList();
             }
             List<String> serverAddrList = zkClient.getChildren(providerPath);
-            zkClient.registerPathChildListener(providerPath, new ServiceListener(serviceName));
+
             return buildServerParams(serverAddrList);
         } catch (Exception e) {
             log.error("从注册中心获取");
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    protected void subscribe(String serviceName) {
+        String providerPath = buildProviderPath(serviceName);
+        zkClient.registerPathChildListener(providerPath, new ServiceListener(serviceName));
     }
 
     @Override
