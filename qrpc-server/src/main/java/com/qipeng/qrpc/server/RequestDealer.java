@@ -20,33 +20,14 @@ import java.util.concurrent.TimeUnit;
  **/
 public class RequestDealer {
 
-    private static ThreadPoolExecutor executor;
+
 
     static  {
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("requestDealer-{}").build();
-        executor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(10000), threadFactory);
+
     }
 
 
     static void dealRequest(Channel channel, RpcRequest request, ServiceProvider provider) {
-        executor.submit(() -> {
-            RpcResponse response = new RpcResponse();
-            response.setRequestId(request.getRequestId());
-            try {
-                Object instance = provider.getInstance();
-                String methodName = request.getMethodName();
-                Class<?>[] paramTypes = request.getParamTypes();
-                Method method = instance.getClass().getMethod(methodName, paramTypes);
-                Object[] params = request.getParameters();
-                Object result = method.invoke(instance, params);
-                response.setResult(result);
-                response.setHasException(false);
-            } catch (Exception e) {
-                response.setHasException(true);
-                response.setResult(e);
-            }
-            channel.writeAndFlush(response);
-        });
+
     }
 }

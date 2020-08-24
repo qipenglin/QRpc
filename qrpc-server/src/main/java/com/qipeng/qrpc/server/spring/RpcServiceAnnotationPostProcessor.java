@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.server.spring;
 
-import com.qipeng.qrpc.server.RpcServer;
+import com.qipeng.qrpc.server.NettyRpcServer;
 import com.qipeng.qrpc.server.ServiceProvider;
 import com.qipeng.qrpc.server.annotation.RpcService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class RpcServiceAnnotationPostProcessor implements BeanPostProcessor {
             ServiceProvider provider = new ServiceProvider();
             provider.setServiceName(serviceInterface.getName());
             provider.setInstance(bean);
-            RpcServer.PROVIDER_MAP.put(serviceInterface.getName(), provider);
+            NettyRpcServer.PROVIDER_MAP.put(serviceInterface.getName(), provider);
         }
         return bean;
     }

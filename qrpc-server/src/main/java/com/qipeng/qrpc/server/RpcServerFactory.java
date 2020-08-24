@@ -2,15 +2,15 @@ package com.qipeng.qrpc.server;
 
 public class RpcServerFactory {
 
-    private static volatile RpcServer server;
+    private static volatile NettyRpcServer server;
 
-    public static RpcServer getServer() {
+    public static NettyRpcServer getServer() {
         if (server != null) {
             return server;
         }
         synchronized (RpcServerFactory.class) {
             if (server == null) {
-                server = new RpcServer();
+                server = new NettyRpcServer();
             }
         }
         return server;

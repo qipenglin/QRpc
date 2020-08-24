@@ -4,18 +4,18 @@ import com.qipeng.qrpc.common.RpcPacket;
 
 public class RpcPacketSerializer {
 
-    private static final byte[] MAGIC_NUM = {0x12, 0x34, 0x56, 0x78};
+    private static final byte MAGIC_NUM = 127;
 
     public static byte[] encode(RpcPacket packet) {
         Serializer serializer = SerializerFactory.getSerializer();
         byte[] content = serializer.serialize(packet);
-        byte[] bytes = new byte[content.length + 6];
-        System.arraycopy(MAGIC_NUM, 0, bytes, 0, 4);
-        bytes[4] = serializer.getSerializerAlgorithm();
-        bytes[5] = packet.getPacketType();
+        byte[] bytes = new byte[content.length + 3];
+        bytes[0] = MAGIC_NUM;
+        bytes[1] = serializer.getSerializerAlgorithm();
+        bytes[2] = packet.getPacketType();
         byte[] len = intToBytes(content.length);
-        System.arraycopy(len, 6, bytes, 0, content.length);
-        System.arraycopy(content, 10, bytes, 0, content.length);
+        System.arraycopy(len, 3, bytes, 0, content.length);
+        System.arraycopy(content, 7, bytes, 0, content.length);
         return bytes;
     }
 

@@ -4,7 +4,7 @@ import com.qipeng.qrpc.common.ServerInfo;
 import com.qipeng.qrpc.common.registry.Registry;
 import com.qipeng.qrpc.common.registry.RegistryFactory;
 import com.qipeng.qrpc.common.util.NetUtil;
-import com.qipeng.qrpc.server.RpcServer;
+import com.qipeng.qrpc.server.NettyRpcServer;
 import com.qipeng.qrpc.server.RpcServerFactory;
 import com.qipeng.qrpc.server.ServiceProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +38,7 @@ public class RpcServerStarter implements ApplicationListener<ContextRefreshedEve
         String localAddr = NetUtil.getLocalAddress();
         ServerInfo serverInfo = new ServerInfo(localAddr, port);
         RpcServerFactory.getServer().start(serverInfo);
-        registerService(RpcServer.PROVIDER_MAP.values(), serverInfo);
+        registerService(NettyRpcServer.PROVIDER_MAP.values(), serverInfo);
         isStarted = true;
 
     }
