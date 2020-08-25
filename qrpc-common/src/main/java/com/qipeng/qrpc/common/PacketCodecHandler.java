@@ -6,7 +6,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
-import io.netty.handler.codec.MessageToMessageCodec;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
         super();
     }
 
-    private static final int MAGIC_NUM = 0x12345678;
+    private static final byte MAGIC_NUM = 127;
 
     private static Map<Byte, Class<? extends RpcPacket>> packetTypeMap = new HashMap<>();
 
@@ -32,7 +31,7 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
-        int magicNum = byteBuf.readInt();
+        byte magicNum = byteBuf.readByte();
         if (magicNum != MAGIC_NUM) {
             throw new RuntimeException("包格式不符合规定");
         }
@@ -50,7 +49,7 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
     protected void encode(ChannelHandlerContext ctx, RpcPacket packet, ByteBuf byteBuf) {
         Serializer serializer = SerializerFactory.getSerializer();
         byte[] bytes = serializer.serialize(packet);
-        byteBuf.writeInt(MAGIC_NUM);
+        byteBuf.writeByte(MAGIC_NUM);
         byteBuf.writeByte(serializer.getSerializerAlgorithm());
         byteBuf.writeByte(packet.getPacketType());
         byteBuf.writeInt(bytes.length);

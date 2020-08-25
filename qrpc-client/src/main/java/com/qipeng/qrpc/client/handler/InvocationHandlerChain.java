@@ -5,18 +5,26 @@ import java.util.List;
 
 public class InvocationHandlerChain {
 
-    private static List<InvocationHandler> handlerList = new ArrayList<>();
+    private static final List<InvocationHandler> handlerList = new ArrayList<>();
 
     static {
+        handlerList.add(new MonitorHandler());
+        handlerList.add(new ServiceDiscoveryHandler());
         handlerList.add(new LoadBalanceHandler());
         handlerList.add(new RpcInvokeHandler());
         buildHandlerChain();
     }
 
     public static Object invoke(InvocationContext context) {
-        return handlerList.get(0).invoke(context);
+        for (InvocationHandler handler : handlerList) {
+            handler.invoke(context);
+        }
+        return context.getResult();
     }
 
+    /**
+     * 构造调用链
+     */
     private static void buildHandlerChain() {
         InvocationHandler next = null;
         for (int i = handlerList.size() - 1; i >= 0; i--) {

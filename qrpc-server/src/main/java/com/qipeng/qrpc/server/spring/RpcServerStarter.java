@@ -1,10 +1,10 @@
 package com.qipeng.qrpc.server.spring;
 
-import com.qipeng.qrpc.common.ServerParam;
+import com.qipeng.qrpc.common.ServerInfo;
 import com.qipeng.qrpc.common.registry.Registry;
 import com.qipeng.qrpc.common.registry.RegistryFactory;
 import com.qipeng.qrpc.common.util.NetUtil;
-import com.qipeng.qrpc.server.RpcServer;
+import com.qipeng.qrpc.server.NettyRpcServer;
 import com.qipeng.qrpc.server.RpcServerFactory;
 import com.qipeng.qrpc.server.ServiceProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,17 +36,17 @@ public class RpcServerStarter implements ApplicationListener<ContextRefreshedEve
             return;
         }
         String localAddr = NetUtil.getLocalAddress();
-        ServerParam serverParam = new ServerParam(localAddr, port);
-        RpcServerFactory.getServer().start(serverParam);
-        registerService(RpcServer.PROVIDER_MAP.values(), serverParam);
+        ServerInfo serverInfo = new ServerInfo(localAddr, port);
+        RpcServerFactory.getServer().start(serverInfo);
+        registerService(NettyRpcServer.PROVIDER_MAP.values(), serverInfo);
         isStarted = true;
 
     }
 
-    private void registerService(Collection<ServiceProvider> providers, ServerParam serverParam) {
+    private void registerService(Collection<ServiceProvider> providers, ServerInfo serverInfo) {
         Registry registry = RegistryFactory.getDefaultRegistry();
         for (ServiceProvider provider : providers) {
-            registry.registerService(provider.getServiceName(), serverParam);
+            registry.registerService(provider.getServiceName(), serverInfo);
         }
     }
 }

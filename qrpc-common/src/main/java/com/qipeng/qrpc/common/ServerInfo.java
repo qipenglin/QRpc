@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ServerParam {
+public class ServerInfo {
 
     private String host;
 

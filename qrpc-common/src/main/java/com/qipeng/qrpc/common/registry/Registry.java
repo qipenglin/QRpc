@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.common.registry;
 
-import com.qipeng.qrpc.common.ServerParam;
+import com.qipeng.qrpc.common.ServerInfo;
 
 import java.util.List;
 
@@ -12,15 +12,15 @@ public interface Registry {
      * @param serviceName
      * @return
      */
-    List<ServerParam> getServerParam(String serviceName);
+    List<ServerInfo> getServerParam(String serviceName);
 
     /**
      * 向注册中心注册服务提供者
      *
      * @param serviceName
-     * @param serverParam
+     * @param serverInfo
      * @return
      */
-    boolean registerService(String serviceName, ServerParam serverParam);
+    boolean registerService(String serviceName, ServerInfo serverInfo);
 
 }

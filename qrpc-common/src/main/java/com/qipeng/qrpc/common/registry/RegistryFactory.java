@@ -5,11 +5,7 @@ import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.registry.impl.RedisRegistry;
 import com.qipeng.qrpc.common.registry.impl.ZookeeperRegistry;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class RegistryFactory {
-    private static Map<RegistryConfig, Registry> registryMap = new HashMap<>();
 
     public static Registry getDefaultRegistry() {
         String uri = RpcConfig.REGISTRY_URI;
@@ -22,22 +18,14 @@ public class RegistryFactory {
         return getRegistry(config);
     }
 
-    public static Registry getRegistry(RegistryConfig config) {
-        if (registryMap.containsKey(config)) {
-            return registryMap.get(config);
-        }
-        synchronized (RegistryFactory.class) {
-            if (registryMap.containsKey(config)) {
-                return registryMap.get(config);
-            }
-            switch (config.getProtocol()) {
-                case REDIS:
-                    return new RedisRegistry(config);
-                case ZOOKEEPER:
-                    return new ZookeeperRegistry(config);
-                default:
-                    throw new RpcException();
-            }
+    private static Registry getRegistry(RegistryConfig config) {
+        switch (config.getProtocol()) {
+            case REDIS:
+                return RedisRegistry.getInstance(config);
+            case ZOOKEEPER:
+                return ZookeeperRegistry.getInstance(config);
+            default:
+                throw new RpcException("暂不支持该注册中心协议");
         }
     }
 

@@ -10,10 +10,12 @@ public abstract class AbstractInvocationHandler implements InvocationHandler {
     private InvocationHandler next;
 
     @Override
-    public Object invoke(InvocationContext context) {
-        Object o = doInvoke(context);
-        return getNext() == null ? o : getNext().invoke(context);
+    public void invoke(InvocationContext context) {
+        doInvoke(context);
+        if (getNext() != null) {
+            getNext().invoke(context);
+        }
     }
 
-    abstract Object doInvoke(InvocationContext context);
+    abstract void doInvoke(InvocationContext context);
 }
