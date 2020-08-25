@@ -1,8 +1,8 @@
 package com.qipeng.qrpc.common.registry.impl;
 
-import com.qipeng.qrpc.common.RpcConfig;
 import com.qipeng.qrpc.common.ServerParam;
 import com.qipeng.qrpc.common.registry.Registry;
+import com.qipeng.qrpc.common.registry.RegistryConfig;
 import com.qipeng.qrpc.common.util.ZookeeperClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -32,23 +32,10 @@ public class ZookeeperRegistry implements Registry {
 
     private final Map<String, List<ServerParam>> serviceMap = new ConcurrentHashMap<>();
 
-    private volatile static ZookeeperRegistry instance;
-
-    public static ZookeeperRegistry getInstance() {
-        if (instance != null) {
-            return instance;
-        }
-        synchronized (ZookeeperRegistry.class) {
-            if (instance == null) {
-                instance = new ZookeeperRegistry();
-            }
-            return instance;
-        }
-    }
-
-    private ZookeeperRegistry() {
+    public ZookeeperRegistry(RegistryConfig config) {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
-        zkClient = new ZookeeperClient(CuratorFrameworkFactory.newClient(RpcConfig.REGISTRY_ADDRESS, retryPolicy));
+        String address = config.getHost() + ":" + config.getPort();
+        zkClient = new ZookeeperClient(CuratorFrameworkFactory.newClient(address, retryPolicy));
     }
 
     @Override

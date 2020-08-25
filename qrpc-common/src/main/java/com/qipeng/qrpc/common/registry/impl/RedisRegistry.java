@@ -1,43 +1,28 @@
 package com.qipeng.qrpc.common.registry.impl;
 
-import com.qipeng.qrpc.common.RpcConfig;
 import com.qipeng.qrpc.common.ServerParam;
 import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.registry.Registry;
+import com.qipeng.qrpc.common.registry.RegistryConfig;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class RedisRegistry implements Registry {
 
-    private volatile static RedisRegistry instance;
-
     private JedisPool jedisPool;
 
-    private RedisRegistry() {
+    public RedisRegistry(RegistryConfig config) {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(1000);
         poolConfig.setMaxIdle(32);
         poolConfig.setMaxWaitMillis(100 * 1000);
         poolConfig.setTestOnBorrow(true);
-        jedisPool = new JedisPool(poolConfig, URI.create(RpcConfig.REGISTRY_ADDRESS));
-    }
-
-    public static RedisRegistry getInstance() {
-        if (instance != null) {
-            return instance;
-        }
-        synchronized (RedisRegistry.class) {
-            if (instance == null) {
-                instance = new RedisRegistry();
-            }
-            return instance;
-        }
+        jedisPool = new JedisPool(poolConfig, config.getHost(), config.getPort());
     }
 
     @Override
