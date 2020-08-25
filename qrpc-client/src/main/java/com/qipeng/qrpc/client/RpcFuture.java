@@ -19,12 +19,12 @@ class RpcFuture {
     static Map<Integer, RpcFuture> futureMap = new ConcurrentHashMap<>();
 
     @Getter
-    private CountDownLatch latch = new CountDownLatch(1);
+    private final CountDownLatch latch = new CountDownLatch(1);
 
     @Getter
-    private Integer requestId;
+    private final Integer requestId;
 
-    private Long invokeTime;
+    private final Long invokeTime;
 
     @Setter
     private RpcResponse response;

@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 
 public class JdkProxyRpcInterceptor implements InvocationHandler {
 
-    private Registry registry;
+    private final Registry registry;
 
     public JdkProxyRpcInterceptor(Registry registry) {
         this.registry = registry;

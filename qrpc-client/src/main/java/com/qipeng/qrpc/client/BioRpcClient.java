@@ -9,12 +9,14 @@ import com.qipeng.qrpc.common.serializer.RpcPacketSerializer;
 import com.qipeng.qrpc.common.serializer.Serializer;
 import com.qipeng.qrpc.common.serializer.SerializerFactory;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+@Slf4j
 public class BioRpcClient implements RpcClient {
 
     private static final byte MAGIC_NUM = 127;
@@ -22,21 +24,29 @@ public class BioRpcClient implements RpcClient {
     @Getter
     private final ServerInfo serverInfo;
 
-    private Socket socket;
+    private volatile Socket socket;
 
     public BioRpcClient(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
         doConnect(serverInfo);
+        new Thread(this::loop).start();
     }
 
     private void doConnect(ServerInfo serverInfo) {
-        Socket socket = new Socket(serverInfo.getHost(), serverInfo.getPort());
+        Socket socket;
+        try {
+            socket = new Socket(serverInfo.getHost(), serverInfo.getPort());
+        } catch (IOException e) {
+            throw new RpcException("连接服务器失败:" + serverInfo);
+        }
         this.socket = socket;
-        new Thread(this::loop).start();
     }
 
     @Override
     public RpcResponse invokeRpc(RpcRequest request) {
+        if (socket == null) {
+            doConnect(serverInfo);
+        }
         byte[] bytes = RpcPacketSerializer.encode(request);
         try {
             OutputStream outputStream = socket.getOutputStream();
@@ -45,8 +55,8 @@ public class BioRpcClient implements RpcClient {
         } catch (IOException e) {
             throw new RpcException("写数据失败");
         }
-        RpcFuture rpcFuture = new RpcFuture(request.getRequestId());
-        return rpcFuture.get();
+        RpcFuture future = new RpcFuture(request.getRequestId());
+        return future.get();
     }
 
     private void loop() {
@@ -59,13 +69,20 @@ public class BioRpcClient implements RpcClient {
                 int len = parseLength(inputStream);
                 byte[] bytes = getBody(inputStream, len);
                 RpcResponse response = serializer.deserialize(RpcResponse.class, bytes);
-                RpcFuture rpcFuture = RpcFuture.futureMap.get(response.getRequestId());
-                if (rpcFuture != null) {
-                    rpcFuture.setResponse(response);
-                    rpcFuture.getLatch().countDown();
+                RpcFuture future = RpcFuture.futureMap.get(response.getRequestId());
+                if (future != null) {
+                    future.setResponse(response);
+                    future.getLatch().countDown();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    socket.close();
+                } catch (Exception exception) {
+                    log.error("关闭Socket失败");
+                } finally {
+                    socket = null;
+                }
+                break;
             }
         }
     }
