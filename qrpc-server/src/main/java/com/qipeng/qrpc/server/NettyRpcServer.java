@@ -2,17 +2,12 @@ package com.qipeng.qrpc.server;
 
 import com.qipeng.qrpc.common.PacketCodecHandler;
 import com.qipeng.qrpc.common.ServerInfo;
-import com.qipeng.qrpc.common.serializer.RpcPacketSplitter;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,9 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public class NettyRpcServer {
-
-    public static final Map<String, ServiceProvider> PROVIDER_MAP = new ConcurrentHashMap<>();
+public class NettyRpcServer implements RpcServer {
 
     private EventLoopGroup boss;
 
@@ -53,7 +46,7 @@ public class NettyRpcServer {
             @Override
             protected void initChannel(SocketChannel channel) throws Exception {
                 ChannelPipeline pipeline = channel.pipeline();
-                pipeline.addLast(new RpcPacketSplitter());
+                pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
                 pipeline.addLast(PacketCodecHandler.INSTANCE);
                 pipeline.addLast(RpcRequestHandler.INSTANCE);
                 pipeline.addLast(new IdleStateHandler(5, 0, 0));

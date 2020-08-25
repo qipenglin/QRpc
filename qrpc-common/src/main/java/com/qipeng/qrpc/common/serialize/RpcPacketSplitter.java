@@ -1,4 +1,4 @@
-package com.qipeng.qrpc.common.serializer;
+package com.qipeng.qrpc.common.serialize;
 
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 

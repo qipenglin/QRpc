@@ -1,4 +1,4 @@
-package com.qipeng.qrpc.common.serializer;
+package com.qipeng.qrpc.common.serialize;
 
 public interface Serializer {
     /**

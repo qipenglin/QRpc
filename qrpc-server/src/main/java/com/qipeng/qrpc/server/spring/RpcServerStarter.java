@@ -38,7 +38,7 @@ public class RpcServerStarter implements ApplicationListener<ContextRefreshedEve
         String localAddr = NetUtil.getLocalAddress();
         ServerInfo serverInfo = new ServerInfo(localAddr, port);
         RpcServerFactory.getServer().start(serverInfo);
-        registerService(NettyRpcServer.PROVIDER_MAP.values(), serverInfo);
+        registerService(RpcServer.PROVIDER_MAP.values(), serverInfo);
         isStarted = true;
 
     }

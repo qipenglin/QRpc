@@ -4,12 +4,12 @@ import com.qipeng.qrpc.common.PacketCodecHandler;
 import com.qipeng.qrpc.common.RpcRequest;
 import com.qipeng.qrpc.common.RpcResponse;
 import com.qipeng.qrpc.common.ServerInfo;
-import com.qipeng.qrpc.common.serializer.RpcPacketSplitter;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class NettyRpcClient implements RpcClient {
             protected void initChannel(SocketChannel ch) throws Exception {
                 // 获取channel中的pipeline
                 ChannelPipeline pipeline = ch.pipeline();
-                pipeline.addLast(new RpcPacketSplitter());
+                pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
                 pipeline.addLast(PacketCodecHandler.INSTANCE);
                 pipeline.addLast(RpcResponseHandler.INSTANCE);
                 pipeline.addLast(new IdleStateHandler(0, 4, 0));

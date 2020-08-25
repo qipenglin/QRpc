@@ -1,9 +1,9 @@
-package com.qipeng.qrpc.common.serializer.impl;
+package com.qipeng.qrpc.common.serialize.impl;
 
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
-import com.qipeng.qrpc.common.serializer.Serializer;
-import com.qipeng.qrpc.common.serializer.SerializerProtocol;
+import com.qipeng.qrpc.common.serialize.Serializer;
+import com.qipeng.qrpc.common.serialize.SerializerProtocol;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;

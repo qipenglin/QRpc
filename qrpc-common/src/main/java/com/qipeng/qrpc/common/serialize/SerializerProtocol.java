@@ -1,9 +1,9 @@
-package com.qipeng.qrpc.common.serializer;
+package com.qipeng.qrpc.common.serialize;
 
-import com.qipeng.qrpc.common.serializer.impl.FastJsonSerializer;
-import com.qipeng.qrpc.common.serializer.impl.HessianSerializer;
-import com.qipeng.qrpc.common.serializer.impl.JDKSerializer;
-import com.qipeng.qrpc.common.serializer.impl.ProtoBufSerializer;
+import com.qipeng.qrpc.common.serialize.impl.FastJsonSerializer;
+import com.qipeng.qrpc.common.serialize.impl.HessianSerializer;
+import com.qipeng.qrpc.common.serialize.impl.JDKSerializer;
+import com.qipeng.qrpc.common.serialize.impl.ProtoBufSerializer;
 
 public enum SerializerProtocol {
 

@@ -1,7 +1,7 @@
 package com.qipeng.qrpc.common;
 
-import com.qipeng.qrpc.common.serializer.Serializer;
-import com.qipeng.qrpc.common.serializer.SerializerFactory;
+import com.qipeng.qrpc.common.serialize.Serializer;
+import com.qipeng.qrpc.common.serialize.SerializerFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

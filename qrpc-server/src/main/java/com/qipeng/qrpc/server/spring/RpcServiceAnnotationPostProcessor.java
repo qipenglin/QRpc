@@ -32,7 +32,7 @@ public class RpcServiceAnnotationPostProcessor implements BeanPostProcessor {
             ServiceProvider provider = new ServiceProvider();
             provider.setServiceName(serviceInterface.getName());
             provider.setInstance(bean);
-            NettyRpcServer.PROVIDER_MAP.put(serviceInterface.getName(), provider);
+            RpcServer.PROVIDER_MAP.put(serviceInterface.getName(), provider);
         }
         return bean;
     }

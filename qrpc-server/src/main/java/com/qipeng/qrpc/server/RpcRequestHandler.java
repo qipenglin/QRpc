@@ -31,13 +31,8 @@ public class RpcRequestHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcRequest request) throws Exception {
-        String serviceName = request.getClazz().getName();
-        ServiceProvider provider = NettyRpcServer.PROVIDER_MAP.get(serviceName);
-        if (provider == null) {
-            throw new RuntimeException("服务不存在");
-        }
         executor.submit(() -> {
-            RpcResponse response = RpcInvoker.invoke(request, provider);
+            RpcResponse response = RpcInvoker.invoke(request);
             ctx.channel().writeAndFlush(response);
         });
     }

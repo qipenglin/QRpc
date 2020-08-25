@@ -7,7 +7,12 @@ import java.lang.reflect.Method;
 
 public class RpcInvoker {
 
-    public static RpcResponse invoke(RpcRequest request, ServiceProvider provider) {
+    public static RpcResponse invoke(RpcRequest request) {
+        String serviceName = request.getClazz().getName();
+        ServiceProvider provider = RpcServer.PROVIDER_MAP.get(serviceName);
+        if (provider == null) {
+            throw new RuntimeException("服务不存在");
+        }
         RpcResponse response = new RpcResponse();
         response.setRequestId(request.getRequestId());
         try {

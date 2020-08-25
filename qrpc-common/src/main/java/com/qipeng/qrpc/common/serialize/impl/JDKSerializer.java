@@ -1,8 +1,8 @@
-package com.qipeng.qrpc.common.serializer.impl;
+package com.qipeng.qrpc.common.serialize.impl;
 
 import com.qipeng.qrpc.common.exception.RpcException;
-import com.qipeng.qrpc.common.serializer.Serializer;
-import com.qipeng.qrpc.common.serializer.SerializerProtocol;
+import com.qipeng.qrpc.common.serialize.Serializer;
+import com.qipeng.qrpc.common.serialize.SerializerProtocol;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
