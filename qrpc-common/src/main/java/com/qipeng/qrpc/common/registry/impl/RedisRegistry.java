@@ -1,8 +1,7 @@
 package com.qipeng.qrpc.common.registry.impl;
 
-import com.qipeng.qrpc.common.config.RpcConfig;
-import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.exception.RpcException;
+import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.registry.AbstractRegistry;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
 import redis.clients.jedis.Jedis;
@@ -28,7 +27,7 @@ public class RedisRegistry extends AbstractRegistry {
         poolConfig.setMaxWaitMillis(100 * 1000);
         poolConfig.setTestOnBorrow(true);
         String address = config.getHost() + ":" + config.getPort();
-        jedisPool = new JedisPool(poolConfig, URI.create(RpcConfig.REGISTRY_ADDRESS));
+        jedisPool = new JedisPool(poolConfig, URI.create(address));
     }
 
     public static RedisRegistry getInstance(RegistryConfig config) {
@@ -57,9 +56,9 @@ public class RedisRegistry extends AbstractRegistry {
             throw new RpcException();
         }
         return servers.stream()
-                      .map(s -> s.split(":"))
-                      .map(s -> new ServerInfo(s[0], Integer.parseInt(s[1])))
-                      .collect(Collectors.toList());
+                .map(s -> s.split(":"))
+                .map(s -> new ServerInfo(s[0], Integer.parseInt(s[1])))
+                .collect(Collectors.toList());
     }
 
     @Override

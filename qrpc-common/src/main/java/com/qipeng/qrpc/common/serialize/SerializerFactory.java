@@ -22,7 +22,7 @@ public class SerializerFactory {
      * @return
      */
     public static Serializer getSerializer() {
-        String serializerName = RpcConfig.PROTOCOL_NAME;
+        String serializerName = RpcConfig.PROTOCOL;
         if (StringUtils.isBlank(serializerName)) {
             serializerName = DEFAULT_SERIALIZER;
         }

@@ -5,10 +5,13 @@ import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.registry.impl.RedisRegistry;
 import com.qipeng.qrpc.common.registry.impl.ZookeeperRegistry;
 
+import static com.qipeng.qrpc.common.registry.RegistryProtocol.REDIS;
+import static com.qipeng.qrpc.common.registry.RegistryProtocol.ZOOKEEPER;
+
 public class RegistryFactory {
 
     public static Registry getDefaultRegistry() {
-        String uri = RpcConfig.REGISTRY_URI;
+        String uri = RpcConfig.REGISTRY;
         RegistryConfig config = buildRegistryConfig(uri);
         return getRegistry(config);
     }
@@ -30,7 +33,7 @@ public class RegistryFactory {
     }
 
     private static RegistryConfig buildRegistryConfig(String uri) {
-        RegistryProtocol protocol = RegistryProtocol.forName(uri.substring(uri.indexOf("/")));
+        RegistryProtocol protocol = RegistryProtocol.forName(uri.substring(0, uri.indexOf(":")));
         String[] words = uri.split(":");
         String host = words[1];
         int port = Integer.parseInt(words[2]);

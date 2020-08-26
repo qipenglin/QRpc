@@ -17,7 +17,7 @@ import java.util.Collection;
 @Component
 public class RpcServerStarter implements ApplicationListener<ContextRefreshedEvent> {
 
-    @Value("${qrpc.protocol.port}")
+    @Value("${qrpc.server.port}")
     private int port;
 
     private volatile boolean isStarted;
