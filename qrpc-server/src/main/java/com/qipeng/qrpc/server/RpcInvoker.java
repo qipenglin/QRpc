@@ -1,7 +1,7 @@
 package com.qipeng.qrpc.server;
 
-import com.qipeng.qrpc.common.RpcRequest;
-import com.qipeng.qrpc.common.RpcResponse;
+import com.qipeng.qrpc.common.model.RpcRequest;
+import com.qipeng.qrpc.common.model.RpcResponse;
 
 import java.lang.reflect.Method;
 

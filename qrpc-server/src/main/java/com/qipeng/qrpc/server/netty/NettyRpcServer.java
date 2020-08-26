@@ -1,7 +1,8 @@
-package com.qipeng.qrpc.server;
+package com.qipeng.qrpc.server.netty;
 
-import com.qipeng.qrpc.common.PacketCodecHandler;
-import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
+import com.qipeng.qrpc.common.model.ServerInfo;
+import com.qipeng.qrpc.server.RpcServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -50,9 +51,9 @@ public class NettyRpcServer implements RpcServer {
                 ChannelPipeline pipeline = channel.pipeline();
                 pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
                 pipeline.addLast(PacketCodecHandler.INSTANCE);
-                pipeline.addLast(RpcRequestHandler.INSTANCE);
+                pipeline.addLast(NettyRpcRequestHandler.INSTANCE);
                 pipeline.addLast(new IdleStateHandler(5, 0, 0));
-                pipeline.addLast(new HeartBeatServerHandler());
+                pipeline.addLast(new NettyServerHeartBeatHandler());
             }
         });
         // 当服务器请求处理线程全满时，用于临时存放已完成三次握手的请求的队列的最大长度

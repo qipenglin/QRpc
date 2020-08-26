@@ -1,13 +1,15 @@
-package com.qipeng.qrpc.common;
+package com.qipeng.qrpc.common.model;
 
 import lombok.Data;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+
 @Data
 public class RpcRequest extends RpcPacket {
 
     private static AtomicInteger requestIdSeed = new AtomicInteger(0);
+
     private Integer requestId;
     /**
      * 接口类

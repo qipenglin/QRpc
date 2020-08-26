@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.common.registry;
 
-import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.model.ServerInfo;
 
 import java.util.List;
 

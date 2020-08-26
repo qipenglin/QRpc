@@ -2,8 +2,8 @@ package com.qipeng.qrpc.client.handler;
 
 import com.qipeng.qrpc.client.RpcClient;
 import com.qipeng.qrpc.client.RpcClientFactory;
-import com.qipeng.qrpc.common.RpcRequest;
-import com.qipeng.qrpc.common.RpcResponse;
+import com.qipeng.qrpc.common.model.RpcRequest;
+import com.qipeng.qrpc.common.model.RpcResponse;
 import com.qipeng.qrpc.common.exception.RpcException;
 
 public class RpcInvokeHandler extends AbstractInvocationHandler {

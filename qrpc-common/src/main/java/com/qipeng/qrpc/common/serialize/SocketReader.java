@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.common.serialize;
 
-import com.qipeng.qrpc.common.RpcPacket;
+import com.qipeng.qrpc.common.model.RpcPacket;
 import com.qipeng.qrpc.common.exception.PacketFormatException;
 
 import java.io.IOException;

@@ -1,17 +1,17 @@
 package com.qipeng.qrpc.client.netty;
 
 import com.qipeng.qrpc.client.RpcFuture;
-import com.qipeng.qrpc.common.RpcResponse;
+import com.qipeng.qrpc.common.model.RpcResponse;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 @ChannelHandler.Sharable
-public class RpcResponseHandler extends SimpleChannelInboundHandler<RpcResponse> {
+public class NettyRpcResponseHandler extends SimpleChannelInboundHandler<RpcResponse> {
 
-    public static final RpcResponseHandler INSTANCE = new RpcResponseHandler();
+    public static final NettyRpcResponseHandler INSTANCE = new NettyRpcResponseHandler();
 
-    private RpcResponseHandler() {
+    private NettyRpcResponseHandler() {
         super();
     }
 

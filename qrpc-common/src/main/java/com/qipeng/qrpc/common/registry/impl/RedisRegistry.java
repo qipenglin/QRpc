@@ -1,7 +1,7 @@
 package com.qipeng.qrpc.common.registry.impl;
 
-import com.qipeng.qrpc.common.RpcConfig;
-import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.config.RpcConfig;
+import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.registry.AbstractRegistry;
 import com.qipeng.qrpc.common.registry.RegistryConfig;

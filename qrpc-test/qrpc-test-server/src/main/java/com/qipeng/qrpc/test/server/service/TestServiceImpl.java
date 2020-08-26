@@ -1,7 +1,4 @@
-package com.qipeng.qrpc.test.server.service;/**
- * @author qipenglin
- * @date 2019-09-05 17:35
- **/
+package com.qipeng.qrpc.test.server.service;
 
 import com.qipeng.qrpc.server.annotation.RpcService;
 import com.qipeng.qrpc.test.api.TestRequest;

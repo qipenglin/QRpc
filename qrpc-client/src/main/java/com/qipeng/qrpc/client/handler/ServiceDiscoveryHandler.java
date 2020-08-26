@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.client.handler;
 
-import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.registry.Registry;
 import org.apache.commons.collections4.CollectionUtils;

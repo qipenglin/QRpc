@@ -1,9 +1,9 @@
-package com.qipeng.qrpc.server;/**
+package com.qipeng.qrpc.server.netty;/**
  * @author qipenglin
  * @date 2019-09-10 11:36
  **/
 
-import com.qipeng.qrpc.common.RpcHeartBeat;
+import com.qipeng.qrpc.common.model.RpcHeartBeat;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2019-09-10 11:36
  **/
 @Slf4j
-public class HeartBeatServerHandler extends SimpleChannelInboundHandler<RpcHeartBeat> {
+public class NettyServerHeartBeatHandler extends SimpleChannelInboundHandler<RpcHeartBeat> {
 
     private Map<Channel, AtomicInteger> lossMap = new HashMap<>();
 

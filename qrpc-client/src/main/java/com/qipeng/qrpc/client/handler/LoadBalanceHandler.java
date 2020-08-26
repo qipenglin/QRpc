@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.client.handler;
 
-import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.model.ServerInfo;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;

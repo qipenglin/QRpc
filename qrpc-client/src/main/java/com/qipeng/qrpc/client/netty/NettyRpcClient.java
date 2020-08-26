@@ -2,10 +2,10 @@ package com.qipeng.qrpc.client.netty;
 
 import com.qipeng.qrpc.client.RpcClient;
 import com.qipeng.qrpc.client.RpcFuture;
-import com.qipeng.qrpc.common.PacketCodecHandler;
-import com.qipeng.qrpc.common.RpcRequest;
-import com.qipeng.qrpc.common.RpcResponse;
-import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
+import com.qipeng.qrpc.common.model.RpcRequest;
+import com.qipeng.qrpc.common.model.RpcResponse;
+import com.qipeng.qrpc.common.model.ServerInfo;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -52,9 +52,9 @@ public class NettyRpcClient implements RpcClient {
                 ChannelPipeline pipeline = ch.pipeline();
                 pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
                 pipeline.addLast(PacketCodecHandler.INSTANCE);
-                pipeline.addLast(RpcResponseHandler.INSTANCE);
+                pipeline.addLast(NettyRpcResponseHandler.INSTANCE);
                 pipeline.addLast(new IdleStateHandler(0, 4, 0));
-                pipeline.addLast(new HeartBeatClientHandler());
+                pipeline.addLast(new NettyClientHeartBeatHandler());
             }
         });
         ChannelFuture channelFuture = null;

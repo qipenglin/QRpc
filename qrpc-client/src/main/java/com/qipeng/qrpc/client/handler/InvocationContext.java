@@ -1,7 +1,7 @@
 package com.qipeng.qrpc.client.handler;
 
-import com.qipeng.qrpc.common.InvokerParam;
-import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.model.InvokerParam;
+import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.registry.Registry;
 import lombok.Data;
 

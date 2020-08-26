@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.server.spring;
 
-import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.registry.Registry;
 import com.qipeng.qrpc.common.registry.RegistryFactory;
 import com.qipeng.qrpc.common.util.NetUtil;

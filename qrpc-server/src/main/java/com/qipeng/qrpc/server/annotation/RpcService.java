@@ -22,4 +22,8 @@ public @interface RpcService {
      * @return 服务接口
      */
     Class<?> serviceInterface();
+
+    String version() default "";
+
+    String group() default "";
 }

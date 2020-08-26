@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.client;
 
-import com.qipeng.qrpc.common.RpcResponse;
+import com.qipeng.qrpc.common.model.RpcResponse;
 import com.qipeng.qrpc.common.exception.RpcException;
 import lombok.Getter;
 import lombok.Setter;

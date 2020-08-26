@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class ServiceProvider {
+
     private String serviceName;
 
     private Object instance;

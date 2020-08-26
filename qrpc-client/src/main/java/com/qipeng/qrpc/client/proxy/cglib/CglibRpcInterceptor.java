@@ -2,7 +2,7 @@ package com.qipeng.qrpc.client.proxy.cglib;
 
 import com.qipeng.qrpc.client.handler.InvocationContext;
 import com.qipeng.qrpc.client.handler.InvocationHandlerChain;
-import com.qipeng.qrpc.common.InvokerParam;
+import com.qipeng.qrpc.common.model.InvokerParam;
 import com.qipeng.qrpc.common.registry.Registry;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;

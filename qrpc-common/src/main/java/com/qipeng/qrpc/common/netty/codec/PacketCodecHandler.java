@@ -1,5 +1,9 @@
-package com.qipeng.qrpc.common;
+package com.qipeng.qrpc.common.netty.codec;
 
+import com.qipeng.qrpc.common.model.RpcHeartBeat;
+import com.qipeng.qrpc.common.model.RpcPacket;
+import com.qipeng.qrpc.common.model.RpcRequest;
+import com.qipeng.qrpc.common.model.RpcResponse;
 import com.qipeng.qrpc.common.serialize.Serializer;
 import com.qipeng.qrpc.common.serialize.SerializerFactory;
 import io.netty.buffer.ByteBuf;

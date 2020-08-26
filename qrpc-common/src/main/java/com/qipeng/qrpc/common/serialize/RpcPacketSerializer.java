@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.common.serialize;
 
-import com.qipeng.qrpc.common.RpcPacket;
+import com.qipeng.qrpc.common.model.RpcPacket;
 
 public class RpcPacketSerializer {
 

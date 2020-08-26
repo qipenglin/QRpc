@@ -1,4 +1,4 @@
-package com.qipeng.qrpc.common;
+package com.qipeng.qrpc.common.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

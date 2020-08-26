@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.common.registry.impl;
 
-import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.registry.AbstractRegistry;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
 import com.qipeng.qrpc.common.util.ZookeeperClient;

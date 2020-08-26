@@ -16,11 +16,11 @@ public class ProtoBufSerializer implements Serializer {
     /**
      * 避免每次序列化都重新申请Buffer空间
      */
-    private static LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+    private static final LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
     /**
      * 缓存Schema
      */
-    private static Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<>();
 
     private ProtoBufSerializer() {
     }

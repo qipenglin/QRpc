@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.common.serialize;
 
-import com.qipeng.qrpc.common.RpcConfig;
+import com.qipeng.qrpc.common.config.RpcConfig;
 import com.qipeng.qrpc.common.serialize.impl.FastJsonSerializer;
 import com.qipeng.qrpc.common.serialize.impl.HessianSerializer;
 import com.qipeng.qrpc.common.serialize.impl.JDKSerializer;

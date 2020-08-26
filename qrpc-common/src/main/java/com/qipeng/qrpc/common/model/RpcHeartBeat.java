@@ -1,4 +1,4 @@
-package com.qipeng.qrpc.common;
+package com.qipeng.qrpc.common.model;
 
 /**
  * @author qipenglin

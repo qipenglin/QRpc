@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.common.registry;
 
-import com.qipeng.qrpc.common.RpcConfig;
+import com.qipeng.qrpc.common.config.RpcConfig;
 import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.registry.impl.RedisRegistry;
 import com.qipeng.qrpc.common.registry.impl.ZookeeperRegistry;
