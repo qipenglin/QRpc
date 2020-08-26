@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.test.server.service;/**
- * @Author qipenglin
- * @Date 2019-09-05 17:35
+ * @author qipenglin
+ * @date 2019-09-05 17:35
  **/
 
 import com.qipeng.qrpc.server.annotation.RpcService;
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
- * @Author qipenglin
- * @Date 2019-09-05 17:35
+ * @author qipenglin
+ * @date 2019-09-05 17:35
  **/
 @Component
 @RpcService(serviceInterface = TestService.class)

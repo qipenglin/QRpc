@@ -1,5 +1,7 @@
-package com.qipeng.qrpc.client;
+package com.qipeng.qrpc.client.bio;
 
+import com.qipeng.qrpc.client.RpcClient;
+import com.qipeng.qrpc.client.RpcFuture;
 import com.qipeng.qrpc.common.RpcRequest;
 import com.qipeng.qrpc.common.RpcResponse;
 import com.qipeng.qrpc.common.ServerInfo;
@@ -8,13 +10,27 @@ import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
 import com.qipeng.qrpc.common.serialize.SocketReader;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class BioRpcClient implements RpcClient {
+
+    private static final ThreadPoolExecutor clientListenExecutor;
+
+    static {
+        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("clientListen-{}").build();
+        clientListenExecutor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
+                                                      new ArrayBlockingQueue<>(10000), threadFactory);
+    }
 
     @Getter
     private final ServerInfo serverInfo;
@@ -24,7 +40,7 @@ public class BioRpcClient implements RpcClient {
     public BioRpcClient(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
         doConnect(serverInfo);
-        new Thread(this::loop).start();
+        clientListenExecutor.submit(this::listen);
     }
 
     private void doConnect(ServerInfo serverInfo) {
@@ -54,7 +70,7 @@ public class BioRpcClient implements RpcClient {
         return future.get();
     }
 
-    private void loop() {
+    private void listen() {
         while (true) {
             try {
                 RpcResponse response = SocketReader.readRpcPacket(socket, RpcResponse.class);
@@ -64,13 +80,7 @@ public class BioRpcClient implements RpcClient {
                     future.getLatch().countDown();
                 }
             } catch (IOException e) {
-                try {
-                    socket.close();
-                } catch (Exception exception) {
-                    log.error("关闭Socket失败");
-                } finally {
-                    socket = null;
-                }
+                IOUtils.closeQuietly(socket, null);
                 break;
             }
         }

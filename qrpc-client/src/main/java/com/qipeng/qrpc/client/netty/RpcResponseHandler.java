@@ -1,5 +1,6 @@
-package com.qipeng.qrpc.client;
+package com.qipeng.qrpc.client.netty;
 
+import com.qipeng.qrpc.client.RpcFuture;
 import com.qipeng.qrpc.common.RpcResponse;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

@@ -1,4 +1,4 @@
-package com.qipeng.qrpc.client;
+package com.qipeng.qrpc.client.netty;
 
 import com.qipeng.qrpc.common.RpcHeartBeat;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,8 +7,8 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
 /**
- * @Author qipenglin
- * @Date 2019-09-10 11:46
+ * @author qipenglin
+ * @date 2019-09-10 11:46
  **/
 public class HeartBeatClientHandler extends ChannelInboundHandlerAdapter {
 

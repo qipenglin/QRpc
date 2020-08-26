@@ -1,5 +1,7 @@
-package com.qipeng.qrpc.client;
+package com.qipeng.qrpc.client.netty;
 
+import com.qipeng.qrpc.client.RpcClient;
+import com.qipeng.qrpc.client.RpcFuture;
 import com.qipeng.qrpc.common.PacketCodecHandler;
 import com.qipeng.qrpc.common.RpcRequest;
 import com.qipeng.qrpc.common.RpcResponse;
@@ -23,7 +25,7 @@ import java.net.InetSocketAddress;
 @Slf4j
 public class NettyRpcClient implements RpcClient {
 
-    private static EventLoopGroup workerGroup = new NioEventLoopGroup();
+    private static final EventLoopGroup workerGroup = new NioEventLoopGroup();
     @Getter
     private final ServerInfo serverInfo;
     private Channel channel;

@@ -1,11 +1,11 @@
 package com.qipeng.qrpc.common.exception;/**
- * @Author qipenglin
- * @Date 2019-09-06 16:23
+ * @author qipenglin
+ * @date 2019-09-06 16:23
  **/
 
 /**
- * @Author qipenglin
- * @Date 2019-09-06 16:23
+ * @author qipenglin
+ * @date 2019-09-06 16:23
  **/
 public class RpcException extends RuntimeException {
 

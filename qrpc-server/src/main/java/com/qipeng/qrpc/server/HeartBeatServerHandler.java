@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.server;/**
- * @Author qipenglin
- * @Date 2019-09-10 11:36
+ * @author qipenglin
+ * @date 2019-09-10 11:36
  **/
 
 import com.qipeng.qrpc.common.RpcHeartBeat;
@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @Author qipenglin
- * @Date 2019-09-10 11:36
+ * @author qipenglin
+ * @date 2019-09-10 11:36
  **/
 @Slf4j
 public class HeartBeatServerHandler extends SimpleChannelInboundHandler<RpcHeartBeat> {

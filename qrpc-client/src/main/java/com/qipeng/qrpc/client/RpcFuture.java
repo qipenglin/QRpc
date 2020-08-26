@@ -12,11 +12,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-class RpcFuture {
+public class RpcFuture {
 
     private static final int timeout = 30000;
 
-    static Map<Integer, RpcFuture> futureMap = new ConcurrentHashMap<>();
+    public static Map<Integer, RpcFuture> futureMap = new ConcurrentHashMap<>();
 
     @Getter
     private final CountDownLatch latch = new CountDownLatch(1);
@@ -29,13 +29,13 @@ class RpcFuture {
     @Setter
     private RpcResponse response;
 
-    RpcFuture(Integer requestId) {
+    public RpcFuture(Integer requestId) {
         this.requestId = requestId;
         this.invokeTime = System.currentTimeMillis();
         futureMap.put(requestId, this);
     }
 
-    RpcResponse get() {
+    public RpcResponse get() {
         while (!isTimeout() && response == null) {
             try {
                 latch.await(timeout, TimeUnit.MILLISECONDS);

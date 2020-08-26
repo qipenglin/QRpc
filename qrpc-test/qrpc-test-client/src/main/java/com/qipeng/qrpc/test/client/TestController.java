@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 /**
- * @Author qipenglin
- * @Date 2019-09-10 18:08
+ * @author qipenglin
+ * @date 2019-09-10 18:08
  **/
 @RestController
 public class TestController {

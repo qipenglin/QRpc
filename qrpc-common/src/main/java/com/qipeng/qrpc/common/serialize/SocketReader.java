@@ -1,7 +1,7 @@
 package com.qipeng.qrpc.common.serialize;
 
 import com.qipeng.qrpc.common.RpcPacket;
-import com.qipeng.qrpc.common.exception.RpcException;
+import com.qipeng.qrpc.common.exception.PacketFormatException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +18,12 @@ public class SocketReader {
         checkPacketType(inputStream, clazz);
         int len = parseLength(inputStream);
         byte[] bytes = getBody(inputStream, len);
-        RpcPacket packet = serializer.deserialize(clazz, bytes);
+        RpcPacket packet = null;
+        try {
+            packet = serializer.deserialize(clazz, bytes);
+        } catch (Exception e) {
+            throw new PacketFormatException("Packet deserialize error", e);
+        }
         return (T) packet;
     }
 
@@ -34,7 +39,7 @@ public class SocketReader {
         byte[] bytes = new byte[1];
         inputStream.read(bytes, 0, 1);
         if (bytes[0] != MAGIC_NUM) {
-            throw new RpcException("Magic No is incorrect");
+            throw new PacketFormatException("Magic No is incorrect");
         }
     }
 
@@ -44,7 +49,7 @@ public class SocketReader {
         Byte packetType = bytes[0];
         if (!RpcPacket.PacketType.RESPONSE.equals(packetType) &&
             !RpcPacket.PacketType.REQUEST.equals(packetType)) {
-            throw new RpcException("PacketType is incorrect");
+            throw new PacketFormatException("PacketType is incorrect");
         }
     }
 

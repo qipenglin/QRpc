@@ -7,6 +7,7 @@ import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
 import com.qipeng.qrpc.common.serialize.SocketReader;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.io.IOException;
@@ -20,12 +21,22 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class BioRpcServer implements RpcServer {
 
-    private static final ThreadPoolExecutor executor;
+    /**
+     * 服务端是否已经启动
+     */
+    private volatile boolean isActivated;
+
+    private static final ThreadPoolExecutor listenExecutor;
+
+    private static final ThreadPoolExecutor invokeExecutor;
 
     static {
         ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("requestDealer-{}").build();
-        executor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
-                                          new ArrayBlockingQueue<>(10000), threadFactory);
+        listenExecutor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
+                                                new ArrayBlockingQueue<>(10000), threadFactory);
+
+        invokeExecutor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
+                                                new ArrayBlockingQueue<>(10000), threadFactory);
     }
 
     @Override
@@ -33,13 +44,16 @@ public class BioRpcServer implements RpcServer {
         ServerSocket serverSocket;
         try {
             serverSocket = new ServerSocket(serverInfo.getPort());
+            log.info("BioRpcServer启动成功:serverInfo:{}", serverInfo);
+            isActivated = true;
         } catch (IOException e) {
             throw new RpcException("启动RpcServer失败:" + serverInfo, e);
         }
-        while (true) {
+        while (isActivated) {
             try {
                 Socket socket = serverSocket.accept();
-                executor.execute(() -> listen(socket));
+                log.info("客户端已连接,remoteAddress:{}", socket.getInetAddress());
+                listenExecutor.execute(() -> listen(socket));
             } catch (Exception e) {
                 log.error("accept失败");
             }
@@ -47,28 +61,26 @@ public class BioRpcServer implements RpcServer {
     }
 
     private void listen(Socket socket) {
-        while (true) {
+        while (isActivated) {
             RpcRequest request;
             try {
                 request = SocketReader.readRpcPacket(socket, RpcRequest.class);
             } catch (IOException e) {
                 break;
             }
-            executor.submit(() -> {
+            invokeExecutor.submit(() -> {
                 RpcResponse response = RpcInvoker.invoke(request);
                 byte[] bytes = RpcPacketSerializer.encode(response);
                 try {
                     socket.getOutputStream().write(bytes);
+                    socket.getOutputStream().flush();
                 } catch (IOException e) {
                     log.error("socket写数据失败");
-                    try {
-                        socket.close();
-                    } catch (Exception e1) {
-                    }
+                    IOUtils.closeQuietly(socket, null);
                 }
             });
         }
-
+        IOUtils.closeQuietly(socket, null);
     }
 
 }
