@@ -22,7 +22,7 @@ public class RpcRequestHandler extends SimpleChannelInboundHandler<RpcRequest> {
     static {
         ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("requestDealer-{}").build();
         executor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(10000), threadFactory);
+                                          new ArrayBlockingQueue<>(10000), threadFactory);
     }
 
     private RpcRequestHandler() {

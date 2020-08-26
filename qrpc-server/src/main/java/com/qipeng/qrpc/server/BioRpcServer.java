@@ -3,8 +3,10 @@ package com.qipeng.qrpc.server;
 import com.qipeng.qrpc.common.RpcRequest;
 import com.qipeng.qrpc.common.RpcResponse;
 import com.qipeng.qrpc.common.ServerInfo;
+import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
 import com.qipeng.qrpc.common.serialize.SocketReader;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.io.IOException;
@@ -15,36 +17,36 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class BioRpcServer implements RpcServer {
 
-    private static ThreadPoolExecutor executor;
+    private static final ThreadPoolExecutor executor;
 
     static {
         ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("requestDealer-{}").build();
         executor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(10000), threadFactory);
+                                          new ArrayBlockingQueue<>(10000), threadFactory);
     }
 
     @Override
     public void start(ServerInfo serverInfo) {
-        ServerSocket serverSocket = new ServerSocket(serverInfo.getPort());
+        ServerSocket serverSocket;
+        try {
+            serverSocket = new ServerSocket(serverInfo.getPort());
+        } catch (IOException e) {
+            throw new RpcException("启动RpcServer失败:" + serverInfo, e);
+        }
         while (true) {
             try {
                 Socket socket = serverSocket.accept();
-                executor.execute(() -> {
-                    try {
-                        dealWithSocket(socket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-            } catch (IOException e) {
+                executor.execute(() -> listen(socket));
+            } catch (Exception e) {
                 log.error("accept失败");
             }
         }
     }
 
-    private void dealWithSocket(Socket socket) throws IOException {
+    private void listen(Socket socket) {
         while (true) {
             RpcRequest request;
             try {

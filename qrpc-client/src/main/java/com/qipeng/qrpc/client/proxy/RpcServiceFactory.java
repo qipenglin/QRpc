@@ -1,6 +1,5 @@
 package com.qipeng.qrpc.client.proxy;
 
-import com.qipeng.qrpc.client.proxy.ProxyFactory;
 import com.qipeng.qrpc.common.registry.Registry;
 
 /**

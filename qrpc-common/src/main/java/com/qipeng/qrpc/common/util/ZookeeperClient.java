@@ -38,7 +38,7 @@ public class ZookeeperClient {
     public String createPerNode(String nodePath, String nodeValue) {
         try {
             return client.create().creatingParentsIfNeeded()
-                    .forPath(nodePath, nodeValue.getBytes());
+                         .forPath(nodePath, nodeValue.getBytes());
         } catch (Exception e) {
             log.error(MessageFormat.format("创建永久Zookeeper节点失败,nodePath:{0},nodeValue:{1}", nodePath, nodeValue), e);
         }
@@ -72,8 +72,8 @@ public class ZookeeperClient {
     public String createSeqPerNode(String nodePath, String nodeValue) {
         try {
             return client.create().creatingParentsIfNeeded()
-                    .withMode(CreateMode.PERSISTENT_SEQUENTIAL)
-                    .forPath(nodePath, nodeValue.getBytes());
+                         .withMode(CreateMode.PERSISTENT_SEQUENTIAL)
+                         .forPath(nodePath, nodeValue.getBytes());
         } catch (Exception e) {
             log.error(MessageFormat.format("创建永久有序Zookeeper节点失败,nodePath:{0},nodeValue:{1}", nodePath, nodeValue), e);
         }
@@ -141,8 +141,8 @@ public class ZookeeperClient {
     public String createSeqEphNode(String nodePath, String nodeValue) {
         try {
             return client.create().creatingParentsIfNeeded()
-                    .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
-                    .forPath(nodePath, nodeValue.getBytes());
+                         .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
+                         .forPath(nodePath, nodeValue.getBytes());
         } catch (Exception e) {
             log.error(MessageFormat.format("创建临时有序Zookeeper节点失败,nodePath:{0},nodeValue:{1}", nodePath, nodeValue), e);
         }

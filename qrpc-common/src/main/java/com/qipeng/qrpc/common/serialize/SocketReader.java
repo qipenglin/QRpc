@@ -43,7 +43,7 @@ public class SocketReader {
         inputStream.read(bytes, 0, 1);
         Byte packetType = bytes[0];
         if (!RpcPacket.PacketType.RESPONSE.equals(packetType) &&
-                !RpcPacket.PacketType.REQUEST.equals(packetType)) {
+            !RpcPacket.PacketType.REQUEST.equals(packetType)) {
             throw new RpcException("PacketType is incorrect");
         }
     }

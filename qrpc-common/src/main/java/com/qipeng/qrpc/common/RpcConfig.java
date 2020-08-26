@@ -12,22 +12,17 @@ import java.util.regex.Pattern;
 @Component
 public class RpcConfig {
 
-    String uriPattern = "[zookeeper|redis]://(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\:([0-9]|[1-9]\\d{1,3}|[1-5]\\d{4}|6[0-5]{2}[0-3][0-5])$";
-
     public static String REGISTRY_URI;
-
     public static String REGISTRY_PROTOCOL;
-
     public static String REGISTRY_ADDRESS;
-
     public static String PROTOCOL_NAME;
-
     public static String PROTOCOL_PORT;
+    String uriPattern = "[zookeeper|redis]://(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\:([0-9]|[1-9]\\d{1,3}|[1-5]\\d{4}|6[0-5]{2}[0-3][0-5])$";
 
     @Value("${qrpc.registry}")
     public void setRegistryUri(String registryUri) {
         Pattern pattern = Pattern.compile(registryUri);
-        if(!pattern.matcher(registryUri).matches()){
+        if (!pattern.matcher(registryUri).matches()) {
             throw new RpcException("REGISTRY_URI 格式有误");
         }
         REGISTRY_URI = registryUri;

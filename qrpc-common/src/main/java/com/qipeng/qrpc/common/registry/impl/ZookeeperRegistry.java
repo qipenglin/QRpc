@@ -13,7 +13,11 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -22,12 +26,15 @@ public class ZookeeperRegistry extends AbstractRegistry {
     private static final String ROOT = "/qrpc";
 
     private static final String PROVIDERS = "providers";
-
-    private final ZookeeperClient zkClient;
-
     private final static Map<RegistryConfig, ZookeeperRegistry> registryMap = new HashMap<>();
-
+    private final ZookeeperClient zkClient;
     private final Map<String, List<ServerInfo>> serviceMap = new ConcurrentHashMap<>();
+
+    private ZookeeperRegistry(RegistryConfig config) {
+        RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
+        String address = config.getHost() + ":" + config.getPort();
+        zkClient = new ZookeeperClient(CuratorFrameworkFactory.newClient(address, retryPolicy));
+    }
 
     public static ZookeeperRegistry getInstance(RegistryConfig config) {
         ZookeeperRegistry registry = registryMap.get(config);
@@ -43,12 +50,6 @@ public class ZookeeperRegistry extends AbstractRegistry {
             registryMap.put(config, registry);
             return registry;
         }
-    }
-
-    private ZookeeperRegistry(RegistryConfig config) {
-        RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
-        String address = config.getHost() + ":" + config.getPort();
-        zkClient = new ZookeeperClient(CuratorFrameworkFactory.newClient(address, retryPolicy));
     }
 
     @Override

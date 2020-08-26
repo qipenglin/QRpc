@@ -14,19 +14,17 @@ import java.util.Map;
 @ChannelHandler.Sharable
 public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
     public static final PacketCodecHandler INSTANCE = new PacketCodecHandler();
-
-    private PacketCodecHandler() {
-        super();
-    }
-
     private static final byte MAGIC_NUM = 127;
-
     private static Map<Byte, Class<? extends RpcPacket>> packetTypeMap = new HashMap<>();
 
     static {
         packetTypeMap.put(RpcPacket.PacketType.HEART_BEAT, RpcHeartBeat.class);
         packetTypeMap.put(RpcPacket.PacketType.REQUEST, RpcRequest.class);
         packetTypeMap.put(RpcPacket.PacketType.RESPONSE, RpcResponse.class);
+    }
+
+    private PacketCodecHandler() {
+        super();
     }
 
     @Override

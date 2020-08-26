@@ -4,8 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * @Author qipenglin
- * @Date ${DATE} ${TIME}
+ * @author qipenglin
  **/
 public class NetUtil {
     public static String getLocalAddress() {

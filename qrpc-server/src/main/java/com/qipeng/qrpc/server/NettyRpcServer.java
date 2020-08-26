@@ -3,16 +3,18 @@ package com.qipeng.qrpc.server;
 import com.qipeng.qrpc.common.PacketCodecHandler;
 import com.qipeng.qrpc.common.ServerInfo;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class NettyRpcServer implements RpcServer {
@@ -61,15 +63,16 @@ public class NettyRpcServer implements RpcServer {
         // 绑定ip和端口，并启动netty
         try {
             bootstrap.bind(serverInfo.getHost(), serverInfo.getPort()).sync()
-                    .addListener(new ChannelFutureListener() {
-                        @Override
-                        public void operationComplete(ChannelFuture future) throws Exception {
-                            log.info("netty启动成功");
-                            isActivated = true;
-                        }
-                    });
+                     .addListener(new ChannelFutureListener() {
+                         @Override
+                         public void operationComplete(ChannelFuture future) throws Exception {
+                             log.info("netty启动成功");
+                             isActivated = true;
+                         }
+                     });
         } catch (InterruptedException e) {
             log.error("绑定ip和端口，并启动netty，失败", e);
         }
     }
+
 }

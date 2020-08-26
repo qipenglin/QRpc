@@ -18,9 +18,18 @@ import java.util.stream.Collectors;
 
 public class RedisRegistry extends AbstractRegistry {
 
+    private static Map<RegistryConfig, RedisRegistry> registryMap = new HashMap<>();
     private JedisPool jedisPool;
 
-    private static Map<RegistryConfig, RedisRegistry> registryMap = new HashMap<>();
+    private RedisRegistry(RegistryConfig config) {
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxTotal(1000);
+        poolConfig.setMaxIdle(32);
+        poolConfig.setMaxWaitMillis(100 * 1000);
+        poolConfig.setTestOnBorrow(true);
+        String address = config.getHost() + ":" + config.getPort();
+        jedisPool = new JedisPool(poolConfig, URI.create(RpcConfig.REGISTRY_ADDRESS));
+    }
 
     public static RedisRegistry getInstance(RegistryConfig config) {
         RedisRegistry registry = registryMap.get(config);
@@ -38,16 +47,6 @@ public class RedisRegistry extends AbstractRegistry {
         }
     }
 
-    private RedisRegistry(RegistryConfig config) {
-        JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxTotal(1000);
-        poolConfig.setMaxIdle(32);
-        poolConfig.setMaxWaitMillis(100 * 1000);
-        poolConfig.setTestOnBorrow(true);
-        String address = config.getHost() + ":" + config.getPort();
-        jedisPool = new JedisPool(poolConfig, URI.create(RpcConfig.REGISTRY_ADDRESS));
-    }
-
     @Override
     public List<ServerInfo> doGetServerParam(String serviceName) {
         Set<String> servers;
@@ -58,9 +57,9 @@ public class RedisRegistry extends AbstractRegistry {
             throw new RpcException();
         }
         return servers.stream()
-                .map(s -> s.split(":"))
-                .map(s -> new ServerInfo(s[0], Integer.parseInt(s[1])))
-                .collect(Collectors.toList());
+                      .map(s -> s.split(":"))
+                      .map(s -> new ServerInfo(s[0], Integer.parseInt(s[1])))
+                      .collect(Collectors.toList());
     }
 
     @Override

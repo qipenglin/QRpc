@@ -5,7 +5,11 @@ import com.qipeng.qrpc.common.RpcRequest;
 import com.qipeng.qrpc.common.RpcResponse;
 import com.qipeng.qrpc.common.ServerInfo;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -20,21 +24,19 @@ import java.net.InetSocketAddress;
 public class NettyRpcClient implements RpcClient {
 
     private static EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-    private Channel channel;
-
     @Getter
     private final ServerInfo serverInfo;
+    private Channel channel;
+
+    public NettyRpcClient(ServerInfo serverInfo) {
+        this.serverInfo = serverInfo;
+        doConnect(serverInfo);
+    }
 
     public RpcResponse invokeRpc(RpcRequest request) {
         channel.writeAndFlush(request);
         RpcFuture rpcFuture = new RpcFuture(request.getRequestId());
         return rpcFuture.get();
-    }
-
-    public NettyRpcClient(ServerInfo serverInfo) {
-        this.serverInfo = serverInfo;
-        doConnect(serverInfo);
     }
 
     private void doConnect(ServerInfo serverInfo) {

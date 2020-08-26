@@ -24,14 +24,6 @@ public enum SerializerProtocol {
         this.serializerClass = serializerClass;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Byte getCode() {
-        return code;
-    }
-
     public static SerializerProtocol getByName(String name) {
         for (SerializerProtocol serializerProtocol : values()) {
             if (name.equals(serializerProtocol.name)) {
@@ -48,6 +40,14 @@ public enum SerializerProtocol {
             }
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Byte getCode() {
+        return code;
     }
 }
 
