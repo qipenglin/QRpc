@@ -2,18 +2,18 @@ package com.qipeng.qrpc.client.proxy;
 
 import com.qipeng.qrpc.client.proxy.cglib.CglibRpcInterceptor;
 import com.qipeng.qrpc.client.proxy.jdkproxy.JdkProxyRpcInterceptor;
-import com.qipeng.qrpc.common.registry.Registry;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
 import org.springframework.cglib.proxy.Enhancer;
 
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ProxyFactory {
 
 
-    private static final Map<RegistryConfig, Map<String, Object>> REGISTRY_PROXY_MAP = new ConcurrentHashMap<>();
+    private static final Map<RegistryConfig, Map<String, Object>> REGISTRY_PROXY_MAP = new HashMap<>();
 
     public static Object getProxy(Class<?> clazz) {
         return getProxy(clazz, null);
