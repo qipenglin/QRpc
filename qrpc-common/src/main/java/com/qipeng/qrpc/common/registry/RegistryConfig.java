@@ -8,6 +8,5 @@ import lombok.Data;
 public class RegistryConfig {
 
     private RegistryProtocol protocol;
-    private String host;
-    private int port;
+    private String address;
 }

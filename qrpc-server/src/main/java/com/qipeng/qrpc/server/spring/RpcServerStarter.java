@@ -24,7 +24,7 @@ public class RpcServerStarter implements ApplicationListener<ContextRefreshedEve
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent applicationEvent) {
-        //防止重读
+        //防止重复启动
         if (applicationEvent.getApplicationContext().getParent() != null) {
             return;
         }

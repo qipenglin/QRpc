@@ -3,17 +3,17 @@ package com.qipeng.qrpc.client.proxy.jdkproxy;
 import com.qipeng.qrpc.client.handler.InvocationContext;
 import com.qipeng.qrpc.client.handler.InvocationHandlerChain;
 import com.qipeng.qrpc.common.model.InvokerParam;
-import com.qipeng.qrpc.common.registry.Registry;
+import com.qipeng.qrpc.common.registry.RegistryConfig;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 public class JdkProxyRpcInterceptor implements InvocationHandler {
 
-    private final Registry registry;
+    private final RegistryConfig registryConfig;
 
-    public JdkProxyRpcInterceptor(Registry registry) {
-        this.registry = registry;
+    public JdkProxyRpcInterceptor(RegistryConfig registryConfig) {
+        this.registryConfig = registryConfig;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class JdkProxyRpcInterceptor implements InvocationHandler {
         invokeParam.setParamTypes(method.getParameterTypes());
         invokeParam.setParameters(args);
         context.setInvokeParam(invokeParam);
-        context.setRegistry(registry);
+        context.setRegistryConfig(registryConfig);
         return InvocationHandlerChain.invoke(context);
     }
 }

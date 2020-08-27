@@ -26,7 +26,7 @@ public class RedisRegistry extends AbstractRegistry {
         poolConfig.setMaxIdle(32);
         poolConfig.setMaxWaitMillis(100 * 1000);
         poolConfig.setTestOnBorrow(true);
-        String address = config.getHost() + ":" + config.getPort();
+        String address = config.getAddress();
         jedisPool = new JedisPool(poolConfig, URI.create(address));
     }
 

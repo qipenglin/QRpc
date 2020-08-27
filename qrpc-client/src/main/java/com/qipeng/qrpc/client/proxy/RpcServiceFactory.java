@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.client.proxy;
 
-import com.qipeng.qrpc.common.registry.Registry;
+import com.qipeng.qrpc.common.registry.RegistryConfig;
 
 /**
  * @author qipenglin
@@ -8,13 +8,13 @@ import com.qipeng.qrpc.common.registry.Registry;
  **/
 public class RpcServiceFactory {
 
-    private Registry registry;
+    private RegistryConfig registryConfig;
 
-    public RpcServiceFactory(Registry registry) {
-        this.registry = registry;
+    public RpcServiceFactory(RegistryConfig registryConfig) {
+        this.registryConfig = registryConfig;
     }
 
     public <T> Object getService(Class<T> clazz) {
-        return ProxyFactory.getProxy(clazz, registry);
+        return ProxyFactory.getProxy(clazz, registryConfig);
     }
 }

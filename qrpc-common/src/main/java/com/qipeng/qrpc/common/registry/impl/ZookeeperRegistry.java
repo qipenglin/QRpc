@@ -13,11 +13,7 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -32,7 +28,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
 
     private ZookeeperRegistry(RegistryConfig config) {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
-        String address = config.getHost() + ":" + config.getPort();
+        String address = config.getAddress();
         zkClient = new ZookeeperClient(CuratorFrameworkFactory.newClient(address, retryPolicy));
     }
 

@@ -3,6 +3,7 @@ package com.qipeng.qrpc.client.handler;
 import com.qipeng.qrpc.common.model.InvokerParam;
 import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.registry.Registry;
+import com.qipeng.qrpc.common.registry.RegistryConfig;
 import lombok.Data;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class InvocationContext {
     /**
      * 注册中心
      */
-    private Registry registry;
+    private RegistryConfig registryConfig;
     /**
      * 可供选择的服务器列表
      */

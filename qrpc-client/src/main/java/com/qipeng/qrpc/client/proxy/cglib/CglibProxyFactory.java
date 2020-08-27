@@ -1,14 +1,14 @@
 package com.qipeng.qrpc.client.proxy.cglib;
 
-import com.qipeng.qrpc.common.registry.Registry;
+import com.qipeng.qrpc.common.registry.RegistryConfig;
 import org.springframework.cglib.proxy.Enhancer;
 
 public class CglibProxyFactory {
 
-    public static Object doCreateProxy(Class<?> clazz, Registry registry) {
+    public static Object doCreateProxy(Class<?> clazz, RegistryConfig registryConfig) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(clazz);
-        enhancer.setCallback(new CglibRpcInterceptor(registry));
+        enhancer.setCallback(new CglibRpcInterceptor(registryConfig));
         return enhancer.create();
     }
 }

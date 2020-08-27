@@ -13,14 +13,7 @@ import java.lang.reflect.Field;
 
 @Slf4j
 @Component
-public class RpcReferenceAnnotationPostProcessor implements BeanPostProcessor, BeanFactoryAware {
-
-    private BeanFactory beanFactory;
-
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.beanFactory = beanFactory;
-    }
+public class RpcReferenceAnnotationPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(Object o, String s) throws BeansException {

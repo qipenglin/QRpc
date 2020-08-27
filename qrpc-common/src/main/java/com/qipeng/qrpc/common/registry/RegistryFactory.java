@@ -5,23 +5,12 @@ import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.registry.impl.RedisRegistry;
 import com.qipeng.qrpc.common.registry.impl.ZookeeperRegistry;
 
-import static com.qipeng.qrpc.common.registry.RegistryProtocol.REDIS;
-import static com.qipeng.qrpc.common.registry.RegistryProtocol.ZOOKEEPER;
-
 public class RegistryFactory {
 
-    public static Registry getDefaultRegistry() {
-        String uri = RpcConfig.REGISTRY;
-        RegistryConfig config = buildRegistryConfig(uri);
-        return getRegistry(config);
-    }
-
-    public static Registry getRegistry(String uri) {
-        RegistryConfig config = buildRegistryConfig(uri);
-        return getRegistry(config);
-    }
-
-    private static Registry getRegistry(RegistryConfig config) {
+    public static Registry getRegistry(RegistryConfig config) {
+        if (config == null) {
+            config = getDefaultRegistryConfig();
+        }
         switch (config.getProtocol()) {
             case REDIS:
                 return RedisRegistry.getInstance(config);
@@ -32,12 +21,14 @@ public class RegistryFactory {
         }
     }
 
-    private static RegistryConfig buildRegistryConfig(String uri) {
-        RegistryProtocol protocol = RegistryProtocol.forName(uri.substring(0, uri.indexOf(":")));
-        String[] words = uri.split(":");
-        String host = words[1];
-        int port = Integer.parseInt(words[2]);
-        return new RegistryConfig(protocol, host, port);
+    public static RegistryConfig getDefaultRegistryConfig() {
+        return buildRegistryConfig(RpcConfig.REGISTRY);
+    }
+
+    public static RegistryConfig buildRegistryConfig(String uri) {
+        String[] words = uri.split("://");
+        RegistryProtocol protocol = RegistryProtocol.forName(words[0]);
+        return new RegistryConfig(protocol, words[1]);
     }
 
 }

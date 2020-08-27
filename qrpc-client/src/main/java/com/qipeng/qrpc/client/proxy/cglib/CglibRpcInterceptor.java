@@ -3,7 +3,7 @@ package com.qipeng.qrpc.client.proxy.cglib;
 import com.qipeng.qrpc.client.handler.InvocationContext;
 import com.qipeng.qrpc.client.handler.InvocationHandlerChain;
 import com.qipeng.qrpc.common.model.InvokerParam;
-import com.qipeng.qrpc.common.registry.Registry;
+import com.qipeng.qrpc.common.registry.RegistryConfig;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
 
@@ -11,10 +11,10 @@ import java.lang.reflect.Method;
 
 public class CglibRpcInterceptor implements MethodInterceptor {
 
-    private final Registry registry;
+    private final RegistryConfig registryConfig;
 
-    public CglibRpcInterceptor(Registry registry) {
-        this.registry = registry;
+    public CglibRpcInterceptor(RegistryConfig registryConfig) {
+        this.registryConfig = registryConfig;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class CglibRpcInterceptor implements MethodInterceptor {
         invokeParam.setParamTypes(method.getParameterTypes());
         invokeParam.setParameters(args);
         context.setInvokeParam(invokeParam);
-        context.setRegistry(registry);
+        context.setRegistryConfig(registryConfig);
         return InvocationHandlerChain.invoke(context);
     }
 }
