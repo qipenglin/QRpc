@@ -7,6 +7,11 @@ import com.qipeng.qrpc.common.registry.impl.ZookeeperRegistry;
 
 public class RegistryFactory {
 
+    public static Registry getDefaultRegistry() {
+        RegistryConfig config = getDefaultRegistryConfig();
+        return getRegistry(config);
+    }
+
     public static Registry getRegistry(RegistryConfig config) {
         if (config == null) {
             config = getDefaultRegistryConfig();

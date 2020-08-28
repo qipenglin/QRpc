@@ -12,6 +12,9 @@
         <module>qrpc-common</module>
         <module>qrpc-client</module>
         <module>qrpc-server</module>
+        <module>qrpc-test-server</module>
+        <module>qrpc-test-client</module>
+        <module>qrpc-test-api</module>
         <module>qrpc-all</module>
     </modules>
     <properties>
