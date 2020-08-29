@@ -1,0 +1,7 @@
+qrpc:
+  registry: zookeeper://127.0.0.1:2181
+  protocol: hessian
+  server:
+    port: 8888
+server:
+  port: 8000
