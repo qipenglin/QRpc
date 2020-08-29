@@ -2,12 +2,17 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.0.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>com.qipeng</groupId>
     <artifactId>Q-Rpc</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <modules>
         <module>qrpc-common</module>
         <module>qrpc-client</module>
@@ -18,7 +23,9 @@
         <module>qrpc-all</module>
     </modules>
     <properties>
-        <qrpc.version>1.0-SNAPSHOT</qrpc.version>
+        <spring-boot.version>2.0.0.RELEASE</spring-boot.version>
+        <spring.version>5.0.4.RELEASE</spring.version>
+        <project.version>1.0.0-SNAPSHOT</project.version>
         <netty.version>4.1.39.Final</netty.version>
         <lombok.version>1.16.12</lombok.version>
         <curator.version>4.2.0</curator.version>
@@ -28,11 +35,53 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.qipeng</groupId>
+                <artifactId>qrpc-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.qipeng</groupId>
+                <artifactId>qrpc-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.qipeng</groupId>
+                <artifactId>qrpc-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.qipeng</groupId>
+                <artifactId>qrpc-all</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.qipeng</groupId>
+                <artifactId>qrpc-test-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.qipeng</groupId>
+                <artifactId>qrpc-test-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.qipeng</groupId>
+                <artifactId>qrpc-test-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.0.0.RELEASE</version>
+                <type>pom</type>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>4.0.0.RELEASE</version>
-                <scope>import</scope>
+                <version>${spring.version}</version>
                 <type>pom</type>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -125,35 +174,31 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <debug>true</debug>
+                    <parameters>true</parameters>
+                    <verbose>false</verbose>
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 </project>
