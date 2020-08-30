@@ -51,8 +51,8 @@ public class NettyRpcClient implements RpcClient {
                 // 获取channel中的pipeline
                 ChannelPipeline pipeline = ch.pipeline();
                 pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
-                pipeline.addLast(PacketCodecHandler.INSTANCE);
-                pipeline.addLast(NettyRpcResponseHandler.INSTANCE);
+                pipeline.addLast(new PacketCodecHandler());
+                pipeline.addLast(new NettyRpcResponseHandler());
                 pipeline.addLast(new IdleStateHandler(0, 4, 0));
                 pipeline.addLast(new NettyClientHeartBeatHandler());
             }

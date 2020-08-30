@@ -16,9 +16,7 @@ public class InvocationHandlerChain {
     }
 
     public static Object invoke(InvocationContext context) {
-        for (InvocationHandler handler : handlerList) {
-            handler.invoke(context);
-        }
+        handlerList.get(0).invoke(context);
         return context.getResult();
     }
 

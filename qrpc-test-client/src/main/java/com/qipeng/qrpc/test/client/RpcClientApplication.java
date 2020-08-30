@@ -17,9 +17,10 @@ public class RpcClientApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-//        TestService testService = (TestService) ProxyFactory.getProxy(TestService.class);
-//        TestRequest request = new TestRequest();
-//        request.setName("Test");
-//        TestResponse test = testService.test(request);
+        TestService testService = (TestService) ProxyFactory.getProxy(TestService.class);
+        TestRequest request = new TestRequest();
+        request.setName("Test");
+        TestResponse test = testService.test(request);
+        System.out.println(test);
     }
 }

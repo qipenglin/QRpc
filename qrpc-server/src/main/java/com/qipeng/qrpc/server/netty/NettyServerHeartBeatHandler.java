@@ -37,7 +37,7 @@ public class NettyServerHeartBeatHandler extends SimpleChannelInboundHandler<Rpc
                 int loss = lossMap.computeIfAbsent(ctx.channel(), ch -> new AtomicInteger(0)).addAndGet(1);
                 if (loss > 3) {
                     lossMap.remove(ctx.channel());
-                    ctx.channel().close();
+//                    ctx.channel().close();
                     log.info("close inactive channel with:{}", ctx.channel().localAddress());
                 }
             }

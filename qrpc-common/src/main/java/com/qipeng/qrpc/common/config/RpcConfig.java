@@ -11,7 +11,7 @@ public class RpcConfig {
 
     public static String REGISTRY;
     public static String PROTOCOL;
-    public static String NETWORK_MODEL = "netty";
+    public static String NETWORK_MODEL;
 
 
     @Value("${qrpc.registry}")
@@ -19,8 +19,13 @@ public class RpcConfig {
         REGISTRY = registry;
     }
 
-    @Value("${qrpc.protocol}")
+    @Value("${qrpc.protocol:hessian}")
     public void setProtocolName(String protocol) {
         PROTOCOL = protocol;
+    }
+
+    @Value("${qrpc.networkModel:netty}")
+    public void setNetworkModel(String networkModel) {
+        NETWORK_MODEL = networkModel;
     }
 }

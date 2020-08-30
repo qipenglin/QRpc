@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 @ChannelHandler.Sharable
 public class NettyRpcRequestHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
-    public static final NettyRpcRequestHandler INSTANCE = new NettyRpcRequestHandler();
-
     private static final ThreadPoolExecutor invokeExecutor;
 
     static {
@@ -26,7 +24,7 @@ public class NettyRpcRequestHandler extends SimpleChannelInboundHandler<RpcReque
                                                 new ArrayBlockingQueue<>(10000), threadFactory);
     }
 
-    private NettyRpcRequestHandler() {
+    public NettyRpcRequestHandler() {
         super();
     }
 

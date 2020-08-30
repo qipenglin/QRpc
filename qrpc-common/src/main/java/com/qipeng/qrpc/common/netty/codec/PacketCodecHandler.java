@@ -7,7 +7,6 @@ import com.qipeng.qrpc.common.model.RpcResponse;
 import com.qipeng.qrpc.common.serialize.Serializer;
 import com.qipeng.qrpc.common.serialize.SerializerFactory;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 
@@ -15,9 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ChannelHandler.Sharable
 public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
-    public static final PacketCodecHandler INSTANCE = new PacketCodecHandler();
     private static final byte MAGIC_NUM = 127;
     private static Map<Byte, Class<? extends RpcPacket>> packetTypeMap = new HashMap<>();
 
@@ -27,7 +24,7 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
         packetTypeMap.put(RpcPacket.PacketType.RESPONSE, RpcResponse.class);
     }
 
-    private PacketCodecHandler() {
+    public PacketCodecHandler() {
         super();
     }
 

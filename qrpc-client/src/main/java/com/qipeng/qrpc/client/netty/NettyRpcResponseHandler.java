@@ -9,9 +9,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 @ChannelHandler.Sharable
 public class NettyRpcResponseHandler extends SimpleChannelInboundHandler<RpcResponse> {
 
-    public static final NettyRpcResponseHandler INSTANCE = new NettyRpcResponseHandler();
-
-    private NettyRpcResponseHandler() {
+    public NettyRpcResponseHandler() {
         super();
     }
 

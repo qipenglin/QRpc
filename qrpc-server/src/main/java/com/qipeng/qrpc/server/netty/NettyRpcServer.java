@@ -50,8 +50,8 @@ public class NettyRpcServer implements RpcServer {
             protected void initChannel(SocketChannel channel) throws Exception {
                 ChannelPipeline pipeline = channel.pipeline();
                 pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
-                pipeline.addLast(PacketCodecHandler.INSTANCE);
-                pipeline.addLast(NettyRpcRequestHandler.INSTANCE);
+                pipeline.addLast(new PacketCodecHandler());
+                pipeline.addLast(new NettyRpcRequestHandler());
                 pipeline.addLast(new IdleStateHandler(5, 0, 0));
                 pipeline.addLast(new NettyServerHeartBeatHandler());
             }

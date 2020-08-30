@@ -9,13 +9,13 @@ public class RpcPacketSerializer {
     public static byte[] encode(RpcPacket packet) {
         Serializer serializer = SerializerFactory.getSerializer();
         byte[] content = serializer.serialize(packet);
-        byte[] bytes = new byte[content.length + 3];
+        byte[] bytes = new byte[content.length + 7];
         bytes[0] = MAGIC_NUM;
         bytes[1] = serializer.getSerializerAlgorithm();
         bytes[2] = packet.getPacketType();
         byte[] len = intToBytes(content.length);
-        System.arraycopy(len, 3, bytes, 0, content.length);
-        System.arraycopy(content, 7, bytes, 0, content.length);
+        System.arraycopy(len, 0, bytes, 3, 4);
+        System.arraycopy(content, 0, bytes, 7, content.length);
         return bytes;
     }
 
