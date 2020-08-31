@@ -40,7 +40,7 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
         byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes);
         Class<? extends RpcPacket> clazz = packetTypeMap.get(packetType);
-        RpcPacket rpcPacket = SerializerFactory.getSerializer(serializerType).deserialize(clazz, bytes);
+        RpcPacket rpcPacket = SerializerFactory.getSerializer(serializerType).deserialize(bytes, clazz);
         out.add(rpcPacket);
     }
 

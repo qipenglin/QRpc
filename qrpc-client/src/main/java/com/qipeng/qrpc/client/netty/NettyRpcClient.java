@@ -2,10 +2,10 @@ package com.qipeng.qrpc.client.netty;
 
 import com.qipeng.qrpc.client.RpcClient;
 import com.qipeng.qrpc.client.RpcFuture;
-import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
 import com.qipeng.qrpc.common.model.RpcRequest;
 import com.qipeng.qrpc.common.model.RpcResponse;
 import com.qipeng.qrpc.common.model.ServerInfo;
+import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -24,7 +24,6 @@ import java.net.InetSocketAddress;
 
 @Slf4j
 public class NettyRpcClient implements RpcClient {
-
     private static final EventLoopGroup workerGroup = new NioEventLoopGroup();
     @Getter
     private final ServerInfo serverInfo;
@@ -57,15 +56,12 @@ public class NettyRpcClient implements RpcClient {
                 pipeline.addLast(new NettyClientHeartBeatHandler());
             }
         });
-        ChannelFuture channelFuture = null;
         try {
-            channelFuture = bootstrap.connect(new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort())).sync();
-        } catch (InterruptedException e) {
-            log.error("netty客户端连接服务器失败，serverParam: {}", serverInfo, e);
-        }
-        if (channelFuture != null) {
+            ChannelFuture channelFuture = bootstrap.connect(new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort())).sync();
             channelFuture.addListener(f -> log.info("启动netty客户端成功，serverInfo: {}", serverInfo));
             channel = channelFuture.channel();
+        } catch (InterruptedException e) {
+            log.error("netty客户端连接服务器失败，serverParam: {}", serverInfo, e);
         }
     }
 }

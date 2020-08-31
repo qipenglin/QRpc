@@ -14,5 +14,5 @@ public interface Serializer {
     /**
      * 二进制转换成 java 对象
      */
-    <T> T deserialize(Class<T> clazz, byte[] bytes);
+    <T> T deserialize(byte[] bytes, Class<T> clazz);
 }

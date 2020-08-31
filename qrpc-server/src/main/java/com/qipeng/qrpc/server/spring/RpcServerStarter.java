@@ -40,7 +40,6 @@ public class RpcServerStarter implements ApplicationListener<ContextRefreshedEve
         RpcServerFactory.getServer().start(serverInfo);
         registerService(RpcServer.PROVIDER_MAP.values(), serverInfo);
         isStarted = true;
-
     }
 
     private void registerService(Collection<ServiceProvider> providers, ServerInfo serverInfo) {

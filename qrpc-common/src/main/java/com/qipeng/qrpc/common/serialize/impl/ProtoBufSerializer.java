@@ -71,7 +71,7 @@ public class ProtoBufSerializer implements Serializer {
     }
 
     @Override
-    public <T> T deserialize(Class<T> clazz, byte[] data) {
+    public <T> T deserialize(byte[] data, Class<T> clazz) {
         Schema<T> schema = getSchema(clazz);
         T obj = schema.newMessage();
         ProtostuffIOUtil.mergeFrom(data, obj, schema);

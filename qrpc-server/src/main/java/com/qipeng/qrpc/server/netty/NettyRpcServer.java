@@ -20,12 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NettyRpcServer implements RpcServer {
 
-    private EventLoopGroup boss;
-
-    private EventLoopGroup worker;
-
-    private ServerBootstrap bootstrap;
-
     /**
      * 服务端是否已经启动
      */
@@ -36,12 +30,11 @@ public class NettyRpcServer implements RpcServer {
             return;
         }
         log.info("尝试启动server: {}", serverInfo);
-
-        boss = new NioEventLoopGroup();
-        worker = new NioEventLoopGroup();
-        bootstrap = new ServerBootstrap();
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        ServerBootstrap bootstrap = new ServerBootstrap();
         // 将boss组和worker组绑定在Netty上下文里
-        bootstrap.group(boss, worker);
+        bootstrap.group(bossGroup, workerGroup);
         // 设置底层Channel
         bootstrap.channel(NioServerSocketChannel.class);
         // 设置业务层Channel

@@ -49,7 +49,7 @@ public class JDKSerializer implements Serializer {
     }
 
     @Override
-    public <T> T deserialize(Class<T> clazz, byte[] bytes) {
+    public <T> T deserialize(byte[] bytes, Class<T> clazz) {
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
         try {
             ObjectInputStream ois = new ObjectInputStream(bis);

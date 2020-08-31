@@ -7,7 +7,7 @@ import com.qipeng.qrpc.common.model.RpcResponse;
 import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
-import com.qipeng.qrpc.common.serialize.SocketReader;
+import com.qipeng.qrpc.common.util.SocketReader;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;

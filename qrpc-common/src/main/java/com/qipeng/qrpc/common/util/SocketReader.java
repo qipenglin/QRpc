@@ -1,7 +1,9 @@
-package com.qipeng.qrpc.common.serialize;
+package com.qipeng.qrpc.common.util;
 
-import com.qipeng.qrpc.common.model.RpcPacket;
 import com.qipeng.qrpc.common.exception.PacketFormatException;
+import com.qipeng.qrpc.common.model.RpcPacket;
+import com.qipeng.qrpc.common.serialize.Serializer;
+import com.qipeng.qrpc.common.serialize.SerializerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +22,7 @@ public class SocketReader {
         byte[] bytes = getBody(inputStream, len);
         RpcPacket packet = null;
         try {
-            packet = serializer.deserialize(clazz, bytes);
+            packet = serializer.deserialize(bytes, clazz);
         } catch (Exception e) {
             throw new PacketFormatException("Packet deserialize error", e);
         }
@@ -30,8 +32,7 @@ public class SocketReader {
     private static int parseLength(InputStream inputStream) throws IOException {
         byte[] bytes = new byte[4];
         inputStream.read(bytes, 0, 4);
-        int len = byte4ToInt(bytes, 0);
-        return len;
+        return ByteUtils.byte4ToInt(bytes, 0);
     }
 
 
@@ -65,13 +66,4 @@ public class SocketReader {
         inputStream.read(bytes, 0, len);
         return bytes;
     }
-
-    public static int byte4ToInt(byte[] bytes, int off) {
-        int b0 = bytes[off] & 0xFF;
-        int b1 = bytes[off + 1] & 0xFF;
-        int b2 = bytes[off + 2] & 0xFF;
-        int b3 = bytes[off + 3] & 0xFF;
-        return (b0 << 24) | (b1 << 16) | (b2 << 8) | b3;
-    }
-
 }

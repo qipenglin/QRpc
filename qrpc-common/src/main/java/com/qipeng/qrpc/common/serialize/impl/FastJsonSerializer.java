@@ -35,7 +35,7 @@ public class FastJsonSerializer implements Serializer {
     }
 
     @Override
-    public <T> T deserialize(Class<T> clazz, byte[] bytes) {
+    public <T> T deserialize(byte[] bytes, Class<T> clazz) {
         return JSON.parseObject(bytes, clazz);
     }
 }
