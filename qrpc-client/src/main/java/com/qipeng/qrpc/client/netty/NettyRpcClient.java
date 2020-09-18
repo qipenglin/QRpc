@@ -9,6 +9,7 @@ import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
@@ -27,21 +28,18 @@ public class NettyRpcClient implements RpcClient {
     private static final EventLoopGroup workerGroup = new NioEventLoopGroup();
     @Getter
     private final ServerInfo serverInfo;
+    private Bootstrap bootstrap;
     private Channel channel;
+    private boolean isConnected;
 
     public NettyRpcClient(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
-        doConnect(serverInfo);
+        initBootstrap();
+        connect(serverInfo);
     }
 
-    public RpcResponse invokeRpc(RpcRequest request) {
-        channel.writeAndFlush(request);
-        RpcFuture rpcFuture = new RpcFuture(request.getRequestId());
-        return rpcFuture.get();
-    }
-
-    private void doConnect(ServerInfo serverInfo) {
-        Bootstrap bootstrap = new Bootstrap();
+    private void initBootstrap() {
+        bootstrap = new Bootstrap();
         bootstrap.group(workerGroup);
         bootstrap.channel(NioSocketChannel.class);
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
@@ -55,10 +53,40 @@ public class NettyRpcClient implements RpcClient {
                 pipeline.addLast(new IdleStateHandler(0, 4, 0));
                 pipeline.addLast(new NettyClientHeartBeatHandler());
             }
+
+            @Override
+            public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+                super.channelInactive(ctx);
+                connect(serverInfo);
+            }
         });
+    }
+
+    public RpcResponse invokeRpc(RpcRequest request) {
+        channel.writeAndFlush(request);
+        RpcFuture rpcFuture = new RpcFuture(request.getRequestId());
+        return rpcFuture.get();
+    }
+
+    private void connect(ServerInfo serverInfo) {
+        if (isConnected) {
+            return;
+        }
+        synchronized (this) {
+            if (isConnected) {
+                return;
+            }
+            doConnect(serverInfo);
+        }
+    }
+
+    private void doConnect(ServerInfo serverInfo) {
         try {
             ChannelFuture channelFuture = bootstrap.connect(new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort())).sync();
-            channelFuture.addListener(f -> log.info("启动netty客户端成功，serverInfo: {}", serverInfo));
+            channelFuture.addListener(f -> {
+                isConnected = true;
+                log.info("启动netty客户端成功，serverInfo: {}", serverInfo);
+            });
             channel = channelFuture.channel();
         } catch (InterruptedException e) {
             log.error("netty客户端连接服务器失败，serverParam: {}", serverInfo, e);

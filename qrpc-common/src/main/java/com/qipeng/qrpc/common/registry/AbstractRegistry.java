@@ -1,7 +1,7 @@
 package com.qipeng.qrpc.common.registry;
 
-import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.exception.RpcException;
+import com.qipeng.qrpc.common.model.ServerInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -17,12 +17,19 @@ public abstract class AbstractRegistry implements Registry {
         if (serverInfos != null) {
             return serverInfos;
         }
-        try {
-            List<ServerInfo> res = doGetServerParam(serviceName);
-            subscribe(serviceName);
-            return res;
-        } catch (Exception e) {
-            throw new RpcException();
+        synchronized (serviceMap) {
+            serverInfos = serviceMap.get(serviceName);
+            if (serverInfos != null) {
+                return serverInfos;
+            }
+            try {
+                serverInfos = doGetServerParam(serviceName);
+                serviceMap.put(serviceName, serverInfos);
+                subscribe(serviceName);
+                return serverInfos;
+            } catch (Exception e) {
+                throw new RpcException();
+            }
         }
     }
 

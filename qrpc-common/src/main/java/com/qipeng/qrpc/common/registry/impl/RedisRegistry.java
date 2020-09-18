@@ -17,8 +17,9 @@ import java.util.stream.Collectors;
 
 public class RedisRegistry extends AbstractRegistry {
 
-    private static Map<RegistryConfig, RedisRegistry> registryMap = new HashMap<>();
-    private JedisPool jedisPool;
+    private static final Map<RegistryConfig, RedisRegistry> registryMap = new HashMap<>();
+
+    private final JedisPool jedisPool;
 
     private RedisRegistry(RegistryConfig config) {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
@@ -56,9 +57,9 @@ public class RedisRegistry extends AbstractRegistry {
             throw new RpcException();
         }
         return servers.stream()
-                .map(s -> s.split(":"))
-                .map(s -> new ServerInfo(s[0], Integer.parseInt(s[1])))
-                .collect(Collectors.toList());
+                      .map(s -> s.split(":"))
+                      .map(s -> new ServerInfo(s[0], Integer.parseInt(s[1])))
+                      .collect(Collectors.toList());
     }
 
     @Override
