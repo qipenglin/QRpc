@@ -9,7 +9,7 @@ import java.nio.channels.SocketChannel;
 
 public class NioDataReader {
 
-    public static final int lengthOfData = 400;
+    public static final int lengthOfData = 40000;
 
     public static void readData(SelectionKey sk) {
         SocketChannel channel = (SocketChannel) sk.channel();
@@ -17,30 +17,30 @@ public class NioDataReader {
         if (nioDataCache == null) {
             sk.attach(nioDataCache = new NioDataCache(1000));
         }
-        ByteBuffer byteBuffer = nioDataCache.byteBuffer;
+        ByteBuffer buffer = nioDataCache.getBuffer();
         try {
             //一口气读完全部数据
-            while (channel.read(byteBuffer) > 0) ;
+            while (channel.read(buffer) > 0) ;
         } catch (IOException e) {
             throw new RpcException("NIO从channel读取数据失败", e);
         }
-        byteBuffer.flip();
-        while (byteBuffer.remaining() >= 7) {
-            int len = byteBuffer.getInt(byteBuffer.position() + 3);
-            if (byteBuffer.remaining() >= len) {
+        buffer.flip();
+        while (buffer.remaining() >= 7) {
+            int len = buffer.getInt(buffer.position() + 3);
+            if (buffer.remaining() >= len) {
                 byte[] data = new byte[len + 3];
-                byteBuffer.get(data);
-                nioDataCache.queue.add(data);
+                buffer.get(data);
+                nioDataCache.add(data);
             } else {
                 break;
             }
         }
 
         //把可能的半包移动到前面，待下一次处理
-        for (int i = 0; i < byteBuffer.remaining(); i++) {
-            byteBuffer.put(i, byteBuffer.get(byteBuffer.position() + i));
+        for (int i = 0; i < buffer.remaining(); i++) {
+            buffer.put(i, buffer.get(buffer.position() + i));
         }
-        byteBuffer.position(byteBuffer.remaining());
-        byteBuffer.limit(byteBuffer.capacity());
+        buffer.position(buffer.remaining());
+        buffer.limit(buffer.capacity());
     }
 }

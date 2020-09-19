@@ -1,5 +1,6 @@
 package com.qipeng.qrpc.client.netty;
 
+import com.qipeng.qrpc.client.AbstractRpcClient;
 import com.qipeng.qrpc.client.RpcClient;
 import com.qipeng.qrpc.client.RpcFuture;
 import com.qipeng.qrpc.common.model.RpcRequest;
@@ -24,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.InetSocketAddress;
 
 @Slf4j
-public class NettyRpcClient implements RpcClient {
+public class NettyRpcClient extends AbstractRpcClient {
     private static final EventLoopGroup workerGroup = new NioEventLoopGroup();
     @Getter
     private final ServerInfo serverInfo;
@@ -68,19 +69,7 @@ public class NettyRpcClient implements RpcClient {
         return rpcFuture.get();
     }
 
-    private void connect(ServerInfo serverInfo) {
-        if (isConnected) {
-            return;
-        }
-        synchronized (this) {
-            if (isConnected) {
-                return;
-            }
-            doConnect(serverInfo);
-        }
-    }
-
-    private void doConnect(ServerInfo serverInfo) {
+    protected void doConnect(ServerInfo serverInfo) {
         try {
             ChannelFuture channelFuture = bootstrap.connect(new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort())).sync();
             channelFuture.addListener(f -> {

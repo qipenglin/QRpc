@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.client.bio;
 
-import com.qipeng.qrpc.client.RpcClient;
+import com.qipeng.qrpc.client.AbstractRpcClient;
 import com.qipeng.qrpc.client.RpcFuture;
 import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.model.RpcRequest;
@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class BioRpcClient implements RpcClient {
+public class BioRpcClient extends AbstractRpcClient {
 
     private static final ThreadPoolExecutor clientListenExecutor;
 
@@ -37,30 +37,16 @@ public class BioRpcClient implements RpcClient {
 
     private volatile Socket socket;
 
-    private volatile boolean isConnected = false;
-
     public BioRpcClient(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
         connect(serverInfo);
     }
 
-    private void connect(ServerInfo serverInfo) {
-        if (isConnected) {
-            return;
-        }
-        synchronized (this) {
-            if (isConnected) {
-                return;
-            }
-            doConnect(serverInfo);
-        }
-    }
-
-    private void doConnect(ServerInfo serverInfo) {
+    protected void doConnect(ServerInfo serverInfo) {
         try {
             Socket socket = new Socket(serverInfo.getHost(), serverInfo.getPort());
             this.socket = socket;
-            isConnected = true;
+            setConnected(true);
             clientListenExecutor.submit(() -> listen(socket));
         } catch (IOException e) {
             throw new RpcException("连接服务器失败:" + serverInfo);
@@ -69,7 +55,7 @@ public class BioRpcClient implements RpcClient {
 
     @Override
     public RpcResponse invokeRpc(RpcRequest request) {
-        if (!isConnected || socket == null || !socket.isClosed()) {
+        if (isConnected() || socket == null || !socket.isClosed()) {
             connect(serverInfo);
         }
         byte[] bytes = RpcPacketSerializer.encode(request);
@@ -80,7 +66,7 @@ public class BioRpcClient implements RpcClient {
         } catch (IOException e) {
             IOUtils.closeQuietly(socket, null);
             socket = null;
-            isConnected = false;
+            setConnected(false);
             throw new RpcException("写数据失败");
         }
         RpcFuture future = new RpcFuture(request.getRequestId());
@@ -88,7 +74,7 @@ public class BioRpcClient implements RpcClient {
     }
 
     private void listen(Socket socket) {
-        while (isConnected && !socket.isClosed()) {
+        while (isConnected() && !socket.isClosed()) {
             try {
                 RpcResponse response = SocketReader.readRpcPacket(socket, RpcResponse.class);
                 RpcFuture future = RpcFuture.futureMap.get(response.getRequestId());

@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.client.nio;
 
-import com.qipeng.qrpc.client.RpcClient;
+import com.qipeng.qrpc.client.AbstractRpcClient;
 import com.qipeng.qrpc.client.RpcFuture;
 import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.model.RpcRequest;
@@ -11,6 +11,7 @@ import com.qipeng.qrpc.common.nio.NioDataReader;
 import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
 import com.qipeng.qrpc.common.util.ByteUtils;
 import lombok.Getter;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.io.IOException;
@@ -34,42 +35,48 @@ import java.util.concurrent.TimeUnit;
  * @author qipenglin
  * @date Created at 2020/8/30 10:26 下午
  */
-public class NioRpcClient implements RpcClient {
+public class NioRpcClient extends AbstractRpcClient {
 
     @Getter
     private final ServerInfo serverInfo;
 
-    private Selector selector;
+    private static final Selector selector;
 
     private SocketChannel channel;
 
     private static final ThreadPoolExecutor clientExecutor;
 
     static {
+        try {
+            selector = Selector.open();
+        } catch (IOException e) {
+            throw new RpcException("初始化selector失败", e);
+        }
         ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("NioRpcClientThread-{}").build();
         clientExecutor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
                                                 new ArrayBlockingQueue<>(10000), threadFactory);
+        clientExecutor.execute(NioRpcClient::listen);
     }
 
     public NioRpcClient(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
-        doConnect(serverInfo);
-        clientExecutor.execute(this::listen);
+        connect(serverInfo);
     }
 
-    private void doConnect(ServerInfo serverInfo) {
+    @Override
+    protected void doConnect(ServerInfo serverInfo) {
         try {
             InetSocketAddress address = new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort());
-            selector = Selector.open();
             channel = SocketChannel.open(address);
             channel.configureBlocking(false);
             channel.register(selector, SelectionKey.OP_READ);
+            setConnected(true);
         } catch (IOException e) {
-            throw new RpcException("创建NioRpcClient失败", e);
+            throw new RpcException("NioRpcClient连接服务器失败", e);
         }
     }
 
-    private void listen() {
+    private static void listen() {
         try {
             while (selector.select() > 0) {
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
@@ -86,7 +93,7 @@ public class NioRpcClient implements RpcClient {
         }
     }
 
-    private void doRead(SelectionKey sk) {
+    private static void  doRead(SelectionKey sk) {
         NioDataReader.readData(sk);
         NioDataCache cache = (NioDataCache) sk.attachment();
         while (cache.isReady()) {
@@ -102,13 +109,15 @@ public class NioRpcClient implements RpcClient {
 
     @Override
     public RpcResponse invokeRpc(RpcRequest request) {
-        if (channel == null) {
+        if (channel == null || !channel.isConnected()) {
             doConnect(serverInfo);
         }
         try {
             byte[] bytes = RpcPacketSerializer.encode(request);
             channel.write(ByteBuffer.wrap(bytes));
         } catch (IOException e) {
+            setConnected(false);
+            IOUtils.closeQuietly(channel, null);
             throw new RpcException("写数据失败");
         }
         RpcFuture future = new RpcFuture(request.getRequestId());
