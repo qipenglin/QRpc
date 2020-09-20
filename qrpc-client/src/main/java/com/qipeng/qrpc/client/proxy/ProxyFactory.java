@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ProxyFactory {
 
-
     private static final Map<RegistryConfig, Map<String, Object>> REGISTRY_PROXY_MAP = new HashMap<>();
 
     public static Object getProxy(Class<?> clazz) {
@@ -39,7 +38,6 @@ public class ProxyFactory {
         synchronized (ProxyFactory.class) {
             if (proxyMap.get(className) == null) {
                 proxy = doCreateCglibProxy(clazz, registryConfig);
-                //proxy = doCreateJdkProxy(clazz, registryConfig);
                 proxyMap.put(clazz.getName(), proxy);
             }
         }

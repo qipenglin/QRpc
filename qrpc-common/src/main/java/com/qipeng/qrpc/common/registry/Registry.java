@@ -15,6 +15,13 @@ public interface Registry {
     List<ServerInfo> getServerParam(String serviceName);
 
     /**
+     * 订阅服务变化
+     *
+     * @param serviceName 服务名称
+     */
+    void subscribe(String serviceName);
+
+    /**
      * 向注册中心注册服务提供者
      *
      * @param serviceName 服务名称

@@ -37,14 +37,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class NioRpcClient extends AbstractRpcClient {
 
+    private static final Selector selector;
+
+    private static final ThreadPoolExecutor clientExecutor;
+
     @Getter
     private final ServerInfo serverInfo;
 
-    private static final Selector selector;
-
     private SocketChannel channel;
-
-    private static final ThreadPoolExecutor clientExecutor;
 
     static {
         try {
@@ -53,7 +53,7 @@ public class NioRpcClient extends AbstractRpcClient {
             throw new RpcException("初始化selector失败", e);
         }
         ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("NioRpcClientThread-{}").build();
-        clientExecutor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
+        clientExecutor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.SECONDS,
                                                 new ArrayBlockingQueue<>(10000), threadFactory);
         clientExecutor.execute(NioRpcClient::listen);
     }
@@ -72,7 +72,7 @@ public class NioRpcClient extends AbstractRpcClient {
             channel.register(selector, SelectionKey.OP_READ);
             setConnected(true);
         } catch (IOException e) {
-            throw new RpcException("NioRpcClient连接服务器失败", e);
+            throw new RpcException("NioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
         }
     }
 
@@ -93,7 +93,7 @@ public class NioRpcClient extends AbstractRpcClient {
         }
     }
 
-    private static void  doRead(SelectionKey sk) {
+    private static void doRead(SelectionKey sk) {
         NioDataReader.readData(sk);
         NioDataCache cache = (NioDataCache) sk.attachment();
         while (cache.isReady()) {
@@ -108,7 +108,8 @@ public class NioRpcClient extends AbstractRpcClient {
     }
 
     @Override
-    public RpcResponse invokeRpc(RpcRequest request) {
+    public RpcResponse invokeRpc(RpcRequest request, int timeout) {
+        RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
         if (channel == null || !channel.isConnected()) {
             doConnect(serverInfo);
         }
@@ -120,7 +121,6 @@ public class NioRpcClient extends AbstractRpcClient {
             IOUtils.closeQuietly(channel, null);
             throw new RpcException("写数据失败");
         }
-        RpcFuture future = new RpcFuture(request.getRequestId());
         return future.get();
     }
 }

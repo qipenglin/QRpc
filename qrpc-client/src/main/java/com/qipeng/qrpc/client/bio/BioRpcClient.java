@@ -24,12 +24,12 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class BioRpcClient extends AbstractRpcClient {
 
-    private static final ThreadPoolExecutor clientListenExecutor;
+    private static final ThreadPoolExecutor clientExecutor;
 
     static {
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("clientListen-{}").build();
-        clientListenExecutor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
-                                                      new ArrayBlockingQueue<>(10000), threadFactory);
+        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("BioRpcClientThread-{}").build();
+        clientExecutor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.SECONDS,
+                                                new ArrayBlockingQueue<>(10000), threadFactory);
     }
 
     @Getter
@@ -47,14 +47,15 @@ public class BioRpcClient extends AbstractRpcClient {
             Socket socket = new Socket(serverInfo.getHost(), serverInfo.getPort());
             this.socket = socket;
             setConnected(true);
-            clientListenExecutor.submit(() -> listen(socket));
+            clientExecutor.submit(() -> listen(socket));
         } catch (IOException e) {
-            throw new RpcException("连接服务器失败:" + serverInfo);
+            throw new RpcException("BioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
         }
     }
 
     @Override
-    public RpcResponse invokeRpc(RpcRequest request) {
+    public RpcResponse invokeRpc(RpcRequest request, int timeout) {
+        RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
         if (isConnected() || socket == null || !socket.isClosed()) {
             connect(serverInfo);
         }
@@ -67,9 +68,8 @@ public class BioRpcClient extends AbstractRpcClient {
             IOUtils.closeQuietly(socket, null);
             socket = null;
             setConnected(false);
-            throw new RpcException("写数据失败");
+            throw new RpcException("BioRpcClient写数据失败,serverInfo:" + serverInfo, e);
         }
-        RpcFuture future = new RpcFuture(request.getRequestId());
         return future.get();
     }
 

@@ -1,8 +1,8 @@
 package com.qipeng.qrpc.client.netty;
 
 import com.qipeng.qrpc.client.AbstractRpcClient;
-import com.qipeng.qrpc.client.RpcClient;
 import com.qipeng.qrpc.client.RpcFuture;
+import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.model.RpcRequest;
 import com.qipeng.qrpc.common.model.RpcResponse;
 import com.qipeng.qrpc.common.model.ServerInfo;
@@ -31,7 +31,6 @@ public class NettyRpcClient extends AbstractRpcClient {
     private final ServerInfo serverInfo;
     private Bootstrap bootstrap;
     private Channel channel;
-    private boolean isConnected;
 
     public NettyRpcClient(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
@@ -63,22 +62,20 @@ public class NettyRpcClient extends AbstractRpcClient {
         });
     }
 
-    public RpcResponse invokeRpc(RpcRequest request) {
+    public RpcResponse invokeRpc(RpcRequest request, int timeout) {
+        RpcFuture rpcFuture = new RpcFuture(request.getRequestId(), timeout);
         channel.writeAndFlush(request);
-        RpcFuture rpcFuture = new RpcFuture(request.getRequestId());
         return rpcFuture.get();
     }
 
     protected void doConnect(ServerInfo serverInfo) {
         try {
             ChannelFuture channelFuture = bootstrap.connect(new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort())).sync();
-            channelFuture.addListener(f -> {
-                isConnected = true;
-                log.info("启动netty客户端成功，serverInfo: {}", serverInfo);
-            });
             channel = channelFuture.channel();
+            setConnected(true);
+            log.info("启动netty客户端成功，serverInfo: {}", serverInfo);
         } catch (InterruptedException e) {
-            log.error("netty客户端连接服务器失败，serverParam: {}", serverInfo, e);
+            throw new RpcException("netty客户端连接服务器失败，serverParam:" + serverInfo, e);
         }
     }
 }
