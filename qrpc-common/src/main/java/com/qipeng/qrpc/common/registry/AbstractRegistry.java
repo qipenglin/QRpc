@@ -1,14 +1,18 @@
 package com.qipeng.qrpc.common.registry;
 
-import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.model.ServerInfo;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 public abstract class AbstractRegistry implements Registry {
 
+    @Getter
     private final Map<String, List<ServerInfo>> serviceMap = new ConcurrentHashMap<>();
 
     @Override
@@ -28,7 +32,8 @@ public abstract class AbstractRegistry implements Registry {
                 subscribe(serviceName);
                 return serverInfos;
             } catch (Exception e) {
-                throw new RpcException();
+                log.error("从注册中心获取服务出现异常", e);
+                return Collections.emptyList();
             }
         }
     }

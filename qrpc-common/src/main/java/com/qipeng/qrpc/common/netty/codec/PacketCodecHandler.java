@@ -16,12 +16,12 @@ import java.util.Map;
 
 public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
     private static final byte MAGIC_NUM = 127;
-    private static Map<Byte, Class<? extends RpcPacket>> packetTypeMap = new HashMap<>();
+    private static final Map<Byte, Class<? extends RpcPacket>> PACKET_TYPE_MAP = new HashMap<>();
 
     static {
-        packetTypeMap.put(RpcPacket.PacketType.HEART_BEAT, RpcHeartBeat.class);
-        packetTypeMap.put(RpcPacket.PacketType.REQUEST, RpcRequest.class);
-        packetTypeMap.put(RpcPacket.PacketType.RESPONSE, RpcResponse.class);
+        PACKET_TYPE_MAP.put(RpcPacket.PacketType.HEART_BEAT, RpcHeartBeat.class);
+        PACKET_TYPE_MAP.put(RpcPacket.PacketType.REQUEST, RpcRequest.class);
+        PACKET_TYPE_MAP.put(RpcPacket.PacketType.RESPONSE, RpcResponse.class);
     }
 
     public PacketCodecHandler() {
@@ -39,7 +39,7 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
         int length = byteBuf.readInt();
         byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes);
-        Class<? extends RpcPacket> clazz = packetTypeMap.get(packetType);
+        Class<? extends RpcPacket> clazz = PACKET_TYPE_MAP.get(packetType);
         RpcPacket rpcPacket = SerializerFactory.getSerializer(serializerType).deserialize(bytes, clazz);
         out.add(rpcPacket);
     }
@@ -47,10 +47,10 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcPacket packet, ByteBuf byteBuf) {
         Serializer serializer = SerializerFactory.getSerializer();
-        byte[] bytes = serializer.serialize(packet);
         byteBuf.writeByte(MAGIC_NUM);
         byteBuf.writeByte(serializer.getSerializerAlgorithm());
         byteBuf.writeByte(packet.getPacketType());
+        byte[] bytes = serializer.serialize(packet);
         byteBuf.writeInt(bytes.length);
         byteBuf.writeBytes(bytes);
     }

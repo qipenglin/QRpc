@@ -2,8 +2,9 @@ package com.qipeng.qrpc.client;
 
 import com.qipeng.qrpc.client.bio.BioRpcClient;
 import com.qipeng.qrpc.client.netty.NettyRpcClient;
-import com.qipeng.qrpc.common.model.NetworkModel;
+import com.qipeng.qrpc.client.nio.NioRpcClient;
 import com.qipeng.qrpc.common.config.RpcConfig;
+import com.qipeng.qrpc.common.model.NetworkModel;
 import com.qipeng.qrpc.common.model.ServerInfo;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +27,9 @@ public class RpcClientFactory {
                 switch (networkModel) {
                     case BIO:
                         client = new BioRpcClient(serverInfo);
+                        break;
+                    case NIO:
+                        client = new NioRpcClient(serverInfo);
                         break;
                     case NETTY:
                     default:

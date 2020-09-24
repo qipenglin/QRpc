@@ -13,7 +13,11 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -60,7 +64,6 @@ public class ZookeeperRegistry extends AbstractRegistry {
                 return Collections.emptyList();
             }
             List<String> serverAddrList = zkClient.getChildren(providerPath);
-
             return buildServerParams(serverAddrList);
         } catch (Exception e) {
             log.error("从注册中心获取");
@@ -69,9 +72,13 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
     @Override
-    protected void subscribe(String serviceName) {
-        String providerPath = buildProviderPath(serviceName);
-        zkClient.registerPathChildListener(providerPath, new ServiceListener(serviceName));
+    public void subscribe(String serviceName) {
+        try {
+            String providerPath = buildProviderPath(serviceName);
+            zkClient.registerPathChildListener(providerPath, new ServiceListener(serviceName));
+        } catch (Exception e) {
+            log.error("监听注册中心服务出现异常", e);
+        }
     }
 
     @Override
@@ -107,7 +114,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
     class ServiceListener implements PathChildrenCacheListener {
-        private String serviceName;
+        private final String serviceName;
 
         private ServiceListener(String serviceName) {
             this.serviceName = serviceName;

@@ -4,6 +4,7 @@ import com.qipeng.qrpc.common.config.RpcConfig;
 import com.qipeng.qrpc.common.model.NetworkModel;
 import com.qipeng.qrpc.server.bio.BioRpcServer;
 import com.qipeng.qrpc.server.netty.NettyRpcServer;
+import com.qipeng.qrpc.server.nio.NioRpcServer;
 
 public class RpcServerFactory {
 
@@ -14,14 +15,19 @@ public class RpcServerFactory {
             return server;
         }
         synchronized (RpcServerFactory.class) {
+            if (server != null) {
+                return server;
+            }
             NetworkModel networkModel = NetworkModel.getByName(RpcConfig.NETWORK_MODEL);
             switch (networkModel) {
                 case BIO:
-                    server = new BioRpcServer();
+                    server = BioRpcServer.getInstance();
                     break;
+                case NIO:
+                    server = NioRpcServer.getInstance();
                 case NETTY:
                 default:
-                    server = new NettyRpcServer();
+                    server = NettyRpcServer.getInstance();
             }
         }
         return server;

@@ -13,11 +13,12 @@ public enum NetworkModel {
 
     NETTY("netty"),
     BIO("bio"),
+    NIO("nio"),
     ;
 
     private final String name;
 
-    private NetworkModel(String name) {
+    NetworkModel(String name) {
         this.name = name;
     }
 

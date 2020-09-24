@@ -23,8 +23,8 @@ public class CglibRpcInterceptor implements MethodInterceptor {
         InvokerParam invokeParam = new InvokerParam();
         invokeParam.setClazz(method.getDeclaringClass());
         invokeParam.setMethodName(method.getName());
-        invokeParam.setParamTypes(method.getParameterTypes());
         invokeParam.setParameters(args);
+        invokeParam.setParamTypes(method.getParameterTypes());
         context.setInvokeParam(invokeParam);
         context.setRegistryConfig(registryConfig);
         return InvocationHandlerChain.invoke(context);

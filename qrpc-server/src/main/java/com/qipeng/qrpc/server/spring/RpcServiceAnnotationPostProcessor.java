@@ -1,5 +1,6 @@
 package com.qipeng.qrpc.server.spring;
 
+import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.server.RpcServer;
 import com.qipeng.qrpc.server.ServiceProvider;
 import com.qipeng.qrpc.server.annotation.RpcService;
@@ -24,10 +25,10 @@ public class RpcServiceAnnotationPostProcessor implements BeanPostProcessor {
             RpcService rpcService = beanClass.getAnnotation(RpcService.class);
             Class<?> serviceInterface = rpcService.serviceInterface();
             if (!serviceInterface.isInterface()) {
-                throw new RuntimeException("serviceInterface of the RpcService on " + beanClass.getName() + " must be a interface");
+                throw new RpcException("serviceInterface of the RpcService on " + beanClass.getName() + " must be a interface");
             }
             if (!serviceInterface.isAssignableFrom(beanClass)) {
-                throw new RuntimeException(beanClass.getName() + " must implements the interface " + serviceInterface.getName());
+                throw new RpcException(beanClass.getName() + " must implements the interface " + serviceInterface.getName());
             }
             ServiceProvider provider = new ServiceProvider();
             provider.setServiceName(serviceInterface.getName());

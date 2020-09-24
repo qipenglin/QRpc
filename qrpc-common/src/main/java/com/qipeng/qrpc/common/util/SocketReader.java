@@ -20,7 +20,7 @@ public class SocketReader {
         checkPacketType(inputStream, clazz);
         int len = parseLength(inputStream);
         byte[] bytes = getBody(inputStream, len);
-        RpcPacket packet = null;
+        RpcPacket packet;
         try {
             packet = serializer.deserialize(bytes, clazz);
         } catch (Exception e) {

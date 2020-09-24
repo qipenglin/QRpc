@@ -1,8 +1,9 @@
 package com.qipeng.qrpc.server.netty;
 
-import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
 import com.qipeng.qrpc.common.model.ServerInfo;
+import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
 import com.qipeng.qrpc.server.RpcServer;
+import com.qipeng.qrpc.server.bio.BioRpcServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -19,12 +20,24 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class NettyRpcServer implements RpcServer {
-
     /**
      * 服务端是否已经启动
      */
     private volatile boolean isActivated;
-
+    private volatile static NettyRpcServer instance;
+    private NettyRpcServer() {
+    }
+    public static NettyRpcServer getInstance() {
+        if (instance == null) {
+            synchronized (BioRpcServer.class) {
+                if (instance == null) {
+                    instance = new NettyRpcServer();
+                    return instance;
+                }
+            }
+        }
+        return instance;
+    }
     public void start(ServerInfo serverInfo) {
         if (isActivated) {
             return;
@@ -33,11 +46,8 @@ public class NettyRpcServer implements RpcServer {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         ServerBootstrap bootstrap = new ServerBootstrap();
-        // 将boss组和worker组绑定在Netty上下文里
-        bootstrap.group(bossGroup, workerGroup);
-        // 设置底层Channel
-        bootstrap.channel(NioServerSocketChannel.class);
-        // 设置业务层Channel
+        bootstrap.group(bossGroup, workerGroup); // 将boss组和worker组绑定在Netty上下文里
+        bootstrap.channel(NioServerSocketChannel.class); // 设置底层Channel
         bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel channel) throws Exception {
@@ -64,8 +74,11 @@ public class NettyRpcServer implements RpcServer {
                              isActivated = true;
                          }
                      });
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             log.error("绑定ip和端口，并启动netty，失败", e);
+        } finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
         }
     }
 

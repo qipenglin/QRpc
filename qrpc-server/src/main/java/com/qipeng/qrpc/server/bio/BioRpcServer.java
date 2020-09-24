@@ -5,6 +5,7 @@ import com.qipeng.qrpc.common.model.RpcRequest;
 import com.qipeng.qrpc.common.model.RpcResponse;
 import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
+import com.qipeng.qrpc.common.serialize.impl.HessianSerializer;
 import com.qipeng.qrpc.common.util.SocketReader;
 import com.qipeng.qrpc.server.RpcInvoker;
 import com.qipeng.qrpc.server.RpcServer;
@@ -22,20 +23,34 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class BioRpcServer implements RpcServer {
-
     /**
      * 服务端是否已经启动
      */
     private volatile boolean isActivated;
 
-    private static final ThreadPoolExecutor serverThreadPool;
+    private final ThreadPoolExecutor serverThreadPool;
 
     private ServerSocket serverSocket;
 
-    static {
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("BioServerThread-{}").build();
+    private volatile static BioRpcServer instance;
+
+    private BioRpcServer() {
+        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("BioServerThread-{}")
+                                                                      .build();
         serverThreadPool = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
                                                   new ArrayBlockingQueue<>(10000), threadFactory);
+    }
+
+    public static BioRpcServer getInstance() {
+        if (instance == null) {
+            synchronized (BioRpcServer.class) {
+                if (instance == null) {
+                    instance = new BioRpcServer();
+                    return instance;
+                }
+            }
+        }
+        return instance;
     }
 
     @Override

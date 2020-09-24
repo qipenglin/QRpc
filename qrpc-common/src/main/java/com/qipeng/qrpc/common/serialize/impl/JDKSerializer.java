@@ -49,6 +49,7 @@ public class JDKSerializer implements Serializer {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T deserialize(byte[] bytes, Class<T> clazz) {
         ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
         try {
