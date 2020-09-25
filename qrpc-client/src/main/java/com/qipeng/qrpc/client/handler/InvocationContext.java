@@ -1,8 +1,7 @@
 package com.qipeng.qrpc.client.handler;
 
-import com.qipeng.qrpc.common.model.InvokerParam;
+import com.qipeng.qrpc.common.model.RpcRequest;
 import com.qipeng.qrpc.common.model.ServerInfo;
-import com.qipeng.qrpc.common.registry.Registry;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
 import lombok.Data;
 
@@ -26,9 +25,9 @@ public class InvocationContext {
     private ServerInfo serverInfo;
 
     /**
-     * 调用参数
+     * rpc请求
      */
-    private InvokerParam invokeParam;
+    private RpcRequest rpcRequest;
 
     /**
      * 调用结果

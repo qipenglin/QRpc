@@ -5,7 +5,6 @@ import com.qipeng.qrpc.common.model.RpcRequest;
 import com.qipeng.qrpc.common.model.RpcResponse;
 import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
-import com.qipeng.qrpc.common.serialize.impl.HessianSerializer;
 import com.qipeng.qrpc.common.util.SocketReader;
 import com.qipeng.qrpc.server.RpcInvoker;
 import com.qipeng.qrpc.server.RpcServer;
@@ -78,7 +77,7 @@ public class BioRpcServer implements RpcServer {
     }
 
     private void listen(Socket socket) {
-        while (isActivated) {
+        while (isActivated && socket != null && !socket.isClosed()) {
             RpcRequest request;
             try {
                 request = SocketReader.readRpcPacket(socket, RpcRequest.class);

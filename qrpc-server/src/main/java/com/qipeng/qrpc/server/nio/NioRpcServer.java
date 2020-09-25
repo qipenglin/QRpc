@@ -52,8 +52,8 @@ public class NioRpcServer implements RpcServer {
 
     private NioRpcServer() {
         ThreadFactory tf = new BasicThreadFactory.Builder().namingPattern("NioServerThread-{}").build();
-        listenThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1,tf);
-        rwThreadPool = new ThreadPoolExecutor(5, 10, 100L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000), tf);
+        listenThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, tf);
+        rwThreadPool = new ThreadPoolExecutor(4, 8, 100L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000), tf);
         invokeTheadPool = new ThreadPoolExecutor(10, 100, 1000L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000), tf);
     }
 
@@ -102,8 +102,9 @@ public class NioRpcServer implements RpcServer {
                     }
                 }
             }
-        } catch (IOException e) {
-            throw new RpcException(e);
+        } catch (Exception e) {
+            log.error("NioServer listen exception", e);
+            this.listen();
         }
     }
 

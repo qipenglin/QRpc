@@ -2,7 +2,7 @@ package com.qipeng.qrpc.client.proxy.cglib;
 
 import com.qipeng.qrpc.client.handler.InvocationContext;
 import com.qipeng.qrpc.client.handler.InvocationHandlerChain;
-import com.qipeng.qrpc.common.model.InvokerParam;
+import com.qipeng.qrpc.common.model.RpcRequest;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
@@ -20,12 +20,12 @@ public class CglibRpcInterceptor implements MethodInterceptor {
     @Override
     public Object intercept(Object o, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         InvocationContext context = new InvocationContext();
-        InvokerParam invokeParam = new InvokerParam();
-        invokeParam.setClazz(method.getDeclaringClass());
-        invokeParam.setMethodName(method.getName());
-        invokeParam.setParameters(args);
-        invokeParam.setParamTypes(method.getParameterTypes());
-        context.setInvokeParam(invokeParam);
+        RpcRequest request = new RpcRequest();
+        request.setClazz(method.getDeclaringClass());
+        request.setMethodName(method.getName());
+        request.setParameters(args);
+        request.setParamTypes(method.getParameterTypes());
+        context.setRpcRequest(request);
         context.setRegistryConfig(registryConfig);
         return InvocationHandlerChain.invoke(context);
     }

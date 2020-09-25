@@ -1,11 +1,12 @@
 package com.qipeng.qrpc.common.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class RpcRequest extends RpcPacket {
 
     private static AtomicInteger requestIdSeed = new AtomicInteger(0);

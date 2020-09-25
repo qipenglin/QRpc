@@ -4,8 +4,6 @@ import com.qipeng.qrpc.client.annotation.RpcReference;
 import com.qipeng.qrpc.client.proxy.ProxyFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 
