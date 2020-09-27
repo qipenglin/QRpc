@@ -76,9 +76,6 @@ public class NettyRpcServer implements RpcServer {
                      });
         } catch (Exception e) {
             log.error("绑定ip和端口，并启动netty，失败", e);
-        } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
         }
     }
 
