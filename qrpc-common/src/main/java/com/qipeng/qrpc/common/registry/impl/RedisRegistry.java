@@ -10,7 +10,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -51,11 +50,7 @@ public class RedisRegistry extends AbstractRegistry {
             return registry;
         }
         synchronized (RedisRegistry.class) {
-            registry = registryMap.get(config);
-            if (registry != null) {
-                return registry;
-            }
-            registry = new RedisRegistry(config);
+            registry = registryMap.computeIfAbsent(config, RedisRegistry::new);
             registryMap.put(config, registry);
             return registry;
         }
