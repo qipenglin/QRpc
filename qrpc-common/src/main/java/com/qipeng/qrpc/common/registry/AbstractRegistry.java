@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class AbstractRegistry implements Registry {
 
     @Getter
-    private final Map<String, List<ServerInfo>> serviceMap = new ConcurrentHashMap<>();
+    protected final Map<String, List<ServerInfo>> serviceMap = new ConcurrentHashMap<>();
 
     @Override
     public List<ServerInfo> getServerInfo(String serviceName) {

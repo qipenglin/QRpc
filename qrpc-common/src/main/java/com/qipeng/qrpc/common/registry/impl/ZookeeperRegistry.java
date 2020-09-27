@@ -28,7 +28,6 @@ public class ZookeeperRegistry extends AbstractRegistry {
     private static final String PROVIDERS = "providers";
     private final static Map<RegistryConfig, ZookeeperRegistry> registryMap = new HashMap<>();
     private final ZookeeperClient zkClient;
-    private final Map<String, List<ServerInfo>> serviceMap = new ConcurrentHashMap<>();
 
     private ZookeeperRegistry(RegistryConfig config) {
         RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
