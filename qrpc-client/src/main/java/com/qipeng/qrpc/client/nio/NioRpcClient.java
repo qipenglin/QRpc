@@ -36,16 +36,11 @@ import java.util.concurrent.TimeUnit;
  * @date Created at 2020/8/30 10:26 下午
  */
 public class NioRpcClient extends AbstractRpcClient {
-
     private static final Selector selector;
-
     private static final ThreadPoolExecutor clientExecutor;
-
     @Getter
     private final ServerInfo serverInfo;
-
     private SocketChannel channel;
-
     static {
         try {
             selector = Selector.open();

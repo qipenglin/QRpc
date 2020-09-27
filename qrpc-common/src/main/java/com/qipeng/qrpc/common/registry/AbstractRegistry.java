@@ -16,7 +16,7 @@ public abstract class AbstractRegistry implements Registry {
     private final Map<String, List<ServerInfo>> serviceMap = new ConcurrentHashMap<>();
 
     @Override
-    public List<ServerInfo> getServerParam(String serviceName) {
+    public List<ServerInfo> getServerInfo(String serviceName) {
         List<ServerInfo> serverInfos = serviceMap.get(serviceName);
         if (serverInfos != null) {
             return serverInfos;

@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ProxyFactory {
+public abstract class ProxyFactory {
 
     private static final Map<RegistryConfig, Map<String, Object>> REGISTRY_PROXY_MAP = new HashMap<>();
 
@@ -43,6 +43,8 @@ public class ProxyFactory {
         }
         return proxyMap.get(className);
     }
+
+    protected abstract Object doCreateProxy(Class<?> clazz, RegistryConfig registryConfig);
 
     private static Object doCreateCglibProxy(Class<?> clazz, RegistryConfig registryConfig) {
         Enhancer enhancer = new Enhancer();

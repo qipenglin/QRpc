@@ -31,5 +31,4 @@ public class InvocationHandlerChain {
             next = handler;
         }
     }
-
 }

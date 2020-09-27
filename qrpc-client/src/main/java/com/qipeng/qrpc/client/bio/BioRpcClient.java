@@ -25,16 +25,14 @@ import java.util.concurrent.TimeUnit;
 public class BioRpcClient extends AbstractRpcClient {
 
     private static final ThreadPoolExecutor clientExecutor;
-
     static {
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("BioRpcClientThread-{}").build();
+        ThreadFactory threadFactory = new BasicThreadFactory.Builder()
+                                      .namingPattern("BioRpcClientThread-{}").build();
         clientExecutor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.SECONDS,
                                                 new ArrayBlockingQueue<>(10000), threadFactory);
     }
-
     @Getter
     private final ServerInfo serverInfo;
-
     private volatile Socket socket;
 
     public BioRpcClient(ServerInfo serverInfo) {

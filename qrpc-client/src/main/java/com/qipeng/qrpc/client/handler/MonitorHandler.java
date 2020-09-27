@@ -7,6 +7,6 @@ public class MonitorHandler extends AbstractInvocationHandler {
 
     @Override
     void doInvoke(InvocationContext context) {
-        log.info("Rpc Invoke,param:{}", context.getInvokeParam());
+        log.info("Rpc Invoke,param:{}", context.getRpcRequest());
     }
 }

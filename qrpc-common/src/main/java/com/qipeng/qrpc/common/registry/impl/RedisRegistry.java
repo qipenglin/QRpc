@@ -4,19 +4,21 @@ import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.registry.AbstractRegistry;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -24,20 +26,23 @@ import java.util.stream.Collectors;
 public class RedisRegistry extends AbstractRegistry {
 
     private static final Map<RegistryConfig, RedisRegistry> registryMap = new HashMap<>();
+
     private static final ScheduledThreadPoolExecutor subscribeExecutor;
-    static {
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("RedisRegistryThread-{}").build();
-        subscribeExecutor = new ScheduledThreadPoolExecutor(10, threadFactory);
-    }
+
     private final JedisPool jedisPool;
+
+    @Getter
+    private final Set<String> subscribedServices;
+
+    static {
+        subscribeExecutor = new ScheduledThreadPoolExecutor(1);
+        subscribeExecutor.scheduleAtFixedRate(RedisRegistry::refreshServerInfo, 60, 60, TimeUnit.SECONDS);
+    }
+
     private RedisRegistry(RegistryConfig config) {
-        JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxTotal(1000);
-        poolConfig.setMaxIdle(32);
-        poolConfig.setMaxWaitMillis(100 * 1000);
-        poolConfig.setTestOnBorrow(true);
         String address = config.getAddress();
-        jedisPool = new JedisPool(poolConfig, URI.create(address));
+        jedisPool = new JedisPool(URI.create(address));
+        subscribedServices = new HashSet<>();
     }
 
     public static RedisRegistry getInstance(RegistryConfig config) {
@@ -73,13 +78,23 @@ public class RedisRegistry extends AbstractRegistry {
 
     @Override
     public void subscribe(String serviceName) {
-        subscribeExecutor.scheduleAtFixedRate(() -> refreshServerInfo(serviceName), 60, 60, TimeUnit.SECONDS);
+        subscribedServices.add(serviceName);
     }
 
-    private void refreshServerInfo(String serviceName) {
+    private static void refreshServerInfo() {
         try {
-            List<ServerInfo> serverInfos = doGetServerParam(serviceName);
-            getServiceMap().put(serviceName, serverInfos);
+            if (MapUtils.isEmpty(registryMap)) {
+                return;
+            }
+            for (RedisRegistry registry : registryMap.values()) {
+                if (!CollectionUtils.isEmpty(registry.getSubscribedServices())) {
+                    continue;
+                }
+                for (String serviceName : registry.getSubscribedServices()) {
+                    List<ServerInfo> serverInfos = registry.doGetServerParam(serviceName);
+                    registry.getServiceMap().put(serviceName, serverInfos);
+                }
+            }
         } catch (Exception e) {
             log.error("监听注册中心服务出现异常", e);
         }

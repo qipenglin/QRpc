@@ -18,8 +18,8 @@ public class ServiceDiscoveryHandler extends AbstractInvocationHandler {
     void doInvoke(InvocationContext context) {
         RegistryConfig registryConfig = context.getRegistryConfig();
         Registry registry = RegistryFactory.getRegistry(registryConfig);
-        String serviceName = context.getInvokeParam().getClazz().getName();
-        List<ServerInfo> serverInfos = registry.getServerParam(serviceName);
+        String serviceName = context.getRpcRequest().getClazz().getName();
+        List<ServerInfo> serverInfos = registry.getServerInfo(serviceName);
         if (CollectionUtils.isEmpty(serverInfos)) {
             throw new RpcException("Service" + serviceName + " Not Found");
         }

@@ -7,6 +7,7 @@ import com.qipeng.qrpc.common.config.RpcConfig;
 import com.qipeng.qrpc.common.model.NetworkModel;
 import com.qipeng.qrpc.common.model.ServerInfo;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -14,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RpcClientFactory {
 
-    private final static ConcurrentHashMap<ServerInfo, RpcClient> clientMap = new ConcurrentHashMap<>();
+    private final static Map<ServerInfo, RpcClient> clientMap = new ConcurrentHashMap<>();
 
     public static RpcClient getClient(ServerInfo serverInfo) {
         RpcClient client = clientMap.get(serverInfo);

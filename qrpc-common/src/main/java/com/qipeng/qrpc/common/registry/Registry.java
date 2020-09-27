@@ -12,7 +12,7 @@ public interface Registry {
      * @param serviceName 服务名称
      * @return 提供者服务器列表
      */
-    List<ServerInfo> getServerParam(String serviceName);
+    List<ServerInfo> getServerInfo(String serviceName);
 
     /**
      * 订阅服务变化
