@@ -79,7 +79,7 @@ public class NioRpcClient extends AbstractRpcClient {
                     SelectionKey sk = iterator.next();
                     iterator.remove();
                     if (sk.isReadable()) {
-                        doRead(sk);
+                        clientExecutor.execute(() -> doRead(sk));
                     }
                 }
             }
