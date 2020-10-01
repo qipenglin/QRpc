@@ -4,6 +4,7 @@ import com.qipeng.qrpc.server.annotation.RpcService;
 import com.qipeng.qrpc.test.api.TestRequest;
 import com.qipeng.qrpc.test.api.TestResponse;
 import com.qipeng.qrpc.test.api.TestService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -17,9 +18,9 @@ import java.util.Date;
 public class TestServiceImpl implements TestService {
 
     @Override
-    public TestResponse test(TestRequest testRequest) {
+    public TestResponse test(TestRequest request) {
         TestResponse response = new TestResponse();
-        response.setName(testRequest.getName());
+        response.setName(StringUtils.upperCase(request.getName()));
         response.setDate(new Date());
         return response;
     }

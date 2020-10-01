@@ -4,8 +4,13 @@ import com.qipeng.qrpc.client.annotation.RpcReference;
 import com.qipeng.qrpc.test.api.TestRequest;
 import com.qipeng.qrpc.test.api.TestResponse;
 import com.qipeng.qrpc.test.api.TestService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.ThreadLocalRandom;
+
+@Slf4j
 @Component
 public class HelloServiceImpl implements HelloService {
 
@@ -15,7 +20,10 @@ public class HelloServiceImpl implements HelloService {
     @Override
     public TestResponse sayHello() {
         TestRequest request = new TestRequest();
-        request.setName("QiPeng");
-        return testService.test(request);
+        String name = RandomStringUtils.randomAlphabetic(ThreadLocalRandom.current().nextInt(20));
+        request.setName(name);
+        TestResponse response = testService.test(request);
+        log.info("request:{},response:{}", request, response);
+        return response;
     }
 }

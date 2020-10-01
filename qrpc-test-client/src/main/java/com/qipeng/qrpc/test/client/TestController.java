@@ -1,6 +1,5 @@
 package com.qipeng.qrpc.test.client;
 
-import com.qipeng.qrpc.test.api.TestResponse;
 import com.qipeng.qrpc.test.client.service.HelloService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,8 +16,10 @@ public class TestController {
     private HelloService helloService;
 
     @RequestMapping("/test")
-    public TestResponse test() {
-        return helloService.sayHello();
+    public void test() {
+        for (int i = 0; i < 10; i++) {
+            helloService.sayHello();
+        }
     }
 
 }
