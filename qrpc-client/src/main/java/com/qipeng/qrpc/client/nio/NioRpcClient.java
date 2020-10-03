@@ -9,7 +9,6 @@ import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.nio.NioDataCache;
 import com.qipeng.qrpc.common.nio.NioDataReader;
 import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
-import com.qipeng.qrpc.common.util.ByteUtils;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -20,7 +19,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 public class NioRpcClient extends AbstractRpcClient {
     private static final Selector selector;
     private static final ThreadPoolExecutor clientExecutor;
+    private volatile static Set<SocketChannel> toBeRegisteredChannel = new HashSet<>();
     @Getter
     private final ServerInfo serverInfo;
     private SocketChannel channel;
@@ -61,10 +63,10 @@ public class NioRpcClient extends AbstractRpcClient {
     @Override
     protected void doConnect(ServerInfo serverInfo) {
         try {
-            InetSocketAddress address = new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort());
-            channel = SocketChannel.open(address);
+            InetSocketAddress serverAddress = new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort());
+            channel = SocketChannel.open(serverAddress);
             channel.configureBlocking(false);
-            channel.register(selector, SelectionKey.OP_READ);
+            toBeRegisteredChannel.add(channel);
             setConnected(true);
         } catch (IOException e) {
             throw new RpcException("NioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
@@ -73,13 +75,21 @@ public class NioRpcClient extends AbstractRpcClient {
 
     private static void listen() {
         try {
-            while (selector.select() > 0) {
+            while (true) {
+                selector.select(100);
+                if (!toBeRegisteredChannel.isEmpty()) {
+                    Set<SocketChannel> temp = toBeRegisteredChannel;
+                    toBeRegisteredChannel = new HashSet<>();
+                    for (SocketChannel c : temp) {
+                        c.register(selector, SelectionKey.OP_READ);
+                    }
+                }
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
                     SelectionKey sk = iterator.next();
                     iterator.remove();
                     if (sk.isReadable()) {
-                        clientExecutor.execute(() -> doRead(sk));
+                        doRead(sk);
                     }
                 }
             }
@@ -93,7 +103,7 @@ public class NioRpcClient extends AbstractRpcClient {
         NioDataCache cache = (NioDataCache) sk.attachment();
         while (cache != null && cache.isReady()) {
             byte[] bytes = cache.getData();
-            RpcResponse response = ByteUtils.deserialize(bytes, RpcResponse.class);
+            RpcResponse response = RpcPacketSerializer.deserialize(bytes, RpcResponse.class);
             RpcFuture future = RpcFuture.futureMap.get(response.getRequestId());
             if (future != null) {
                 future.setResponse(response);
@@ -109,7 +119,7 @@ public class NioRpcClient extends AbstractRpcClient {
             doConnect(serverInfo);
         }
         try {
-            byte[] bytes = RpcPacketSerializer.encode(request);
+            byte[] bytes = RpcPacketSerializer.serialize(request);
             channel.write(ByteBuffer.wrap(bytes));
         } catch (IOException e) {
             setConnected(false);

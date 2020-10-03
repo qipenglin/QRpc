@@ -59,7 +59,7 @@ public class BioRpcClient extends AbstractRpcClient {
         if (!isConnected() || socket == null || !socket.isClosed()) {
             connect(serverInfo);
         }
-        byte[] bytes = RpcPacketSerializer.encode(request);
+        byte[] bytes = RpcPacketSerializer.serialize(request);
         try {
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(bytes);

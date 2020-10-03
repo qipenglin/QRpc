@@ -7,7 +7,6 @@ import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.nio.NioDataCache;
 import com.qipeng.qrpc.common.nio.NioDataReader;
 import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
-import com.qipeng.qrpc.common.util.ByteUtils;
 import com.qipeng.qrpc.server.RpcInvoker;
 import com.qipeng.qrpc.server.RpcServer;
 import com.qipeng.qrpc.server.bio.BioRpcServer;
@@ -22,14 +21,9 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
- *
  * Company: www.vivo.com
  * Copyright: (c) All Rights Reserved.
  * Information:
@@ -39,9 +33,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class NioRpcServer implements RpcServer {
-    /**
-     * 服务端是否已经启动
-     */
+
     private volatile boolean isActivated;
     private ServerSocketChannel channel;
     private Selector selector;
@@ -83,14 +75,16 @@ public class NioRpcServer implements RpcServer {
             channel.register(selector, SelectionKey.OP_ACCEPT);
             isActivated = true;
             listenThreadPool.submit(this::listen);
+            log.info("NioRpcServer 启动成功，port:{}", serverInfo.getPort());
         } catch (IOException e) {
-            throw new RpcException("启动服务器失败");
+            throw new RpcException("启动服务器失败", e);
         }
     }
 
     private void listen() {
         try {
-            while (isActivated && selector.select() > 0) {
+            while (isActivated) {
+                selector.select(100);
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
                     SelectionKey sk = iterator.next();
@@ -98,7 +92,7 @@ public class NioRpcServer implements RpcServer {
                     if (sk.isAcceptable()) {
                         accept();
                     } else if (sk.isReadable()) {
-                        rwThreadPool.submit(() -> read(sk));
+                        read(sk);
                     }
                 }
             }
@@ -125,18 +119,18 @@ public class NioRpcServer implements RpcServer {
             NioDataCache cache = (NioDataCache) sk.attachment();
             while (cache.isReady()) {
                 byte[] bytes = cache.getData();
-                RpcRequest request = ByteUtils.deserialize(bytes, RpcRequest.class);
+                RpcRequest request = RpcPacketSerializer.deserialize(bytes, RpcRequest.class);
                 invokeTheadPool.submit(() -> invokeRpc(request, sk));
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error("处理数据失败", e);
             sk.cancel();
         }
     }
 
     private void invokeRpc(RpcRequest request, SelectionKey sk) {
         RpcResponse response = RpcInvoker.invoke(request);
-        byte[] bytes = RpcPacketSerializer.encode(response);
+        byte[] bytes = RpcPacketSerializer.serialize(response);
         rwThreadPool.execute(() -> {
             try {
                 ((SocketChannel) sk.channel()).write(ByteBuffer.wrap(bytes));

@@ -18,9 +18,7 @@ public class TestController {
 
     @RequestMapping("/test")
     public void test() {
-        for (int i = 0; i < 10; i++) {
-            helloService.sayHello();
-        }
+        helloService.sayHello();
     }
 
 }

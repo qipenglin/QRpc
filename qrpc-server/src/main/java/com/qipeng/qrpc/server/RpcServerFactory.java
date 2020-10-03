@@ -25,6 +25,7 @@ public class RpcServerFactory {
                     break;
                 case NIO:
                     server = NioRpcServer.getInstance();
+                    break;
                 case NETTY:
                 default:
                     server = NettyRpcServer.getInstance();

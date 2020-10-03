@@ -10,6 +10,8 @@ import java.util.Queue;
 @Data
 public class NioDataCache {
 
+    private static final int CACHE_SIZE = 1024 * 1024;
+
     //消息暂存队列，最大只能存储size条消息
     private Queue<byte[]> queue;
 
@@ -18,7 +20,7 @@ public class NioDataCache {
 
     public NioDataCache(int size) {
         queue = new ArrayDeque<>(size);
-        buffer = ByteBuffer.allocate(NioDataReader.lengthOfData * 10);
+        buffer = ByteBuffer.allocate(CACHE_SIZE);
     }
 
     public boolean isReady() {

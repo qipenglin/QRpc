@@ -86,7 +86,7 @@ public class BioRpcServer implements RpcServer {
             }
             serverThreadPool.submit(() -> {
                 RpcResponse response = RpcInvoker.invoke(request);
-                byte[] bytes = RpcPacketSerializer.encode(response);
+                byte[] bytes = RpcPacketSerializer.serialize(response);
                 try {
                     socket.getOutputStream().write(bytes);
                     socket.getOutputStream().flush();
