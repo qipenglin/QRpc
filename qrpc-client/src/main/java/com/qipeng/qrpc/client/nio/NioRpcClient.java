@@ -27,7 +27,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * Company: www.vivo.com
  * Copyright: (c) All Rights Reserved.
  * Information:
@@ -41,6 +40,7 @@ public class NioRpcClient extends AbstractRpcClient {
     @Getter
     private final ServerInfo serverInfo;
     private SocketChannel channel;
+
     static {
         try {
             selector = Selector.open();
@@ -49,7 +49,7 @@ public class NioRpcClient extends AbstractRpcClient {
         }
         ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("NioRpcClientThread-{}").build();
         clientExecutor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.SECONDS,
-                                                new ArrayBlockingQueue<>(10000), threadFactory);
+                new ArrayBlockingQueue<>(10000), threadFactory);
         clientExecutor.execute(NioRpcClient::listen);
     }
 
@@ -91,7 +91,7 @@ public class NioRpcClient extends AbstractRpcClient {
     private static void doRead(SelectionKey sk) {
         NioDataReader.readData(sk);
         NioDataCache cache = (NioDataCache) sk.attachment();
-        while (cache.isReady()) {
+        while (cache != null && cache.isReady()) {
             byte[] bytes = cache.getData();
             RpcResponse response = ByteUtils.deserialize(bytes, RpcResponse.class);
             RpcFuture future = RpcFuture.futureMap.get(response.getRequestId());
@@ -105,7 +105,7 @@ public class NioRpcClient extends AbstractRpcClient {
     @Override
     public RpcResponse invokeRpc(RpcRequest request, int timeout) {
         RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
-        if (channel == null || !channel.isConnected()) {
+        if (!isConnected() || channel == null || !channel.isConnected()) {
             doConnect(serverInfo);
         }
         try {

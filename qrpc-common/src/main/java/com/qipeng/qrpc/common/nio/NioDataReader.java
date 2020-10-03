@@ -1,6 +1,7 @@
 package com.qipeng.qrpc.common.nio;
 
 import com.qipeng.qrpc.common.exception.RpcException;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -22,6 +23,7 @@ public class NioDataReader {
             //一口气读完全部数据
             while (channel.read(buffer) > 0) ;
         } catch (IOException e) {
+            IOUtils.closeQuietly(channel, null);
             throw new RpcException("NIO从channel读取数据失败", e);
         }
         buffer.flip();

@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- *
  * Company: www.vivo.com
  * Copyright: (c) All Rights Reserved.
  * Information:
@@ -20,7 +19,7 @@ public abstract class AbstractRpcClient implements RpcClient {
 
     @Getter
     @Setter
-    private volatile boolean isConnected;
+    private volatile boolean connected;
 
     @Override
     public RpcResponse invokeRpc(RpcRequest request) {
@@ -29,11 +28,11 @@ public abstract class AbstractRpcClient implements RpcClient {
 
     @Override
     public void connect(ServerInfo serverInfo) {
-        if (isConnected) {
+        if (isConnected()) {
             return;
         }
         synchronized (this) {
-            if (isConnected) {
+            if (isConnected()) {
                 return;
             }
             try {

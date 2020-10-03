@@ -25,6 +25,11 @@ public class InvocationContext {
     private ServerInfo serverInfo;
 
     /**
+     * 超时时间
+     */
+    private int timeout;
+
+    /**
      * rpc请求
      */
     private RpcRequest rpcRequest;

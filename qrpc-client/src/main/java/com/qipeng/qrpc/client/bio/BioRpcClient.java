@@ -25,12 +25,14 @@ import java.util.concurrent.TimeUnit;
 public class BioRpcClient extends AbstractRpcClient {
 
     private static final ThreadPoolExecutor clientExecutor;
+
     static {
         ThreadFactory threadFactory = new BasicThreadFactory.Builder()
-                                      .namingPattern("BioRpcClientThread-{}").build();
+                .namingPattern("BioRpcClientThread-{}").build();
         clientExecutor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.SECONDS,
-                                                new ArrayBlockingQueue<>(10000), threadFactory);
+                new ArrayBlockingQueue<>(10000), threadFactory);
     }
+
     @Getter
     private final ServerInfo serverInfo;
     private volatile Socket socket;
@@ -54,7 +56,7 @@ public class BioRpcClient extends AbstractRpcClient {
     @Override
     public RpcResponse invokeRpc(RpcRequest request, int timeout) {
         RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
-        if (isConnected() || socket == null || !socket.isClosed()) {
+        if (!isConnected() || socket == null || !socket.isClosed()) {
             connect(serverInfo);
         }
         byte[] bytes = RpcPacketSerializer.encode(request);
@@ -62,13 +64,13 @@ public class BioRpcClient extends AbstractRpcClient {
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(bytes);
             outputStream.flush();
-        } catch (IOException e) {
+            return future.get();
+        } catch (Exception e) {
             IOUtils.closeQuietly(socket, null);
             socket = null;
             setConnected(false);
             throw new RpcException("BioRpcClient写数据失败,serverInfo:" + serverInfo, e);
         }
-        return future.get();
     }
 
     private void listen(Socket socket) {

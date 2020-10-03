@@ -21,7 +21,7 @@ public class ServiceDiscoveryHandler extends AbstractInvocationHandler {
         String serviceName = context.getRpcRequest().getClazz().getName();
         List<ServerInfo> serverInfos = registry.getServerInfo(serviceName);
         if (CollectionUtils.isEmpty(serverInfos)) {
-            throw new RpcException("Service" + serviceName + " Not Found");
+            throw new RpcException("No Providers for Service " + serviceName);
         }
         context.setServerInfos(serverInfos);
     }

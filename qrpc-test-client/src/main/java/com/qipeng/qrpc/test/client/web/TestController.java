@@ -1,4 +1,4 @@
-package com.qipeng.qrpc.test.client;
+package com.qipeng.qrpc.test.client.web;
 
 import com.qipeng.qrpc.test.client.service.HelloService;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +12,7 @@ import javax.annotation.Resource;
  **/
 @RestController
 public class TestController {
+
     @Resource
     private HelloService helloService;
 

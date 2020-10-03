@@ -14,8 +14,8 @@ import java.lang.reflect.Field;
 public class RpcReferenceAnnotationPostProcessor implements BeanPostProcessor {
 
     @Override
-    public Object postProcessBeforeInitialization(Object o, String s) throws BeansException {
-        return null;
+    public Object postProcessBeforeInitialization(Object bean, String s) throws BeansException {
+        return bean;
     }
 
     @Override
