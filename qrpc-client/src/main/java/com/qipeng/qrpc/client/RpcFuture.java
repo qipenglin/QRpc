@@ -16,7 +16,7 @@ public class RpcFuture {
 
     private static final int DEFAULT_TIMEOUT = 30000;
 
-    public static Map<Integer, RpcFuture> futureMap = new ConcurrentHashMap<>();
+    private static final Map<Integer, RpcFuture> futureMap = new ConcurrentHashMap<>();
 
     @Getter
     private final CountDownLatch latch = new CountDownLatch(1);
@@ -36,6 +36,10 @@ public class RpcFuture {
         this.start = System.currentTimeMillis();
         this.timeout = timeout <= 0 ? DEFAULT_TIMEOUT : timeout;
         futureMap.put(requestId, this);
+    }
+
+    public static RpcFuture getFuture(Integer requestId) {
+        return futureMap.get(requestId);
     }
 
     public RpcResponse get() {

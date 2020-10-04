@@ -14,12 +14,12 @@ public class NettyRpcResponseHandler extends SimpleChannelInboundHandler<RpcResp
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RpcResponse rpcResponse) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, RpcResponse response) throws Exception {
 
-        RpcFuture rpcFuture = RpcFuture.futureMap.get(rpcResponse.getRequestId());
-        if (rpcFuture != null) {
-            rpcFuture.setResponse(rpcResponse);
-            rpcFuture.getLatch().countDown();
+        RpcFuture future = RpcFuture.getFuture(response.getRequestId());
+        if (future != null) {
+            future.setResponse(response);
+            future.getLatch().countDown();
         }
     }
 }

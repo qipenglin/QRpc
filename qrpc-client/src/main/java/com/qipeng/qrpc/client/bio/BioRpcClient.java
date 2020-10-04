@@ -56,7 +56,7 @@ public class BioRpcClient extends AbstractRpcClient {
         while (isConnected() && socket.isConnected() && !socket.isClosed()) {
             try {
                 RpcResponse response = SocketReader.readRpcPacket(socket, RpcResponse.class);
-                RpcFuture future = RpcFuture.futureMap.get(response.getRequestId());
+                RpcFuture future = RpcFuture.getFuture(response.getRequestId());
                 if (future != null) {
                     future.setResponse(response);
                     future.getLatch().countDown();
