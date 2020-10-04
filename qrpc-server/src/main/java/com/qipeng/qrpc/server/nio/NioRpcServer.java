@@ -130,6 +130,7 @@ public class NioRpcServer implements RpcServer {
     }
 
     private void invokeRpc(RpcRequest request, SelectionKey sk) {
+        log.info("NioRpcServer request:{}", request);
         RpcResponse response = RpcInvoker.invoke(request);
         writeThreadPool.execute(() -> {
             try {

@@ -116,6 +116,7 @@ public class NioRpcClient extends AbstractRpcClient {
 
     @Override
     public RpcResponse invokeRpc(RpcRequest request, int timeout) {
+        log.info("NioRpcClient request:{}", request);
         RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
         if (!isConnected() || channel == null || !channel.isConnected() || !channel.isOpen()) {
             doConnect(serverInfo);

@@ -9,11 +9,13 @@ import com.qipeng.qrpc.common.serialize.SerializerFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
     private static final byte MAGIC_NUM = 127;
     private static final Map<Byte, Class<? extends RpcPacket>> PACKET_TYPE_MAP = new HashMap<>();
@@ -40,8 +42,8 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
         byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes);
         Class<? extends RpcPacket> clazz = PACKET_TYPE_MAP.get(packetType);
-        RpcPacket rpcPacket = SerializerFactory.getSerializer(serializerType).deserialize(bytes, clazz);
-        out.add(rpcPacket);
+        RpcPacket packet = SerializerFactory.getSerializer(serializerType).deserialize(bytes, clazz);
+        out.add(packet);
     }
 
     @Override
@@ -53,5 +55,6 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
         byte[] bytes = serializer.serialize(packet);
         byteBuf.writeInt(bytes.length);
         byteBuf.writeBytes(bytes);
+        log.info("NettyRpcClient request:{}", packet);
     }
 }

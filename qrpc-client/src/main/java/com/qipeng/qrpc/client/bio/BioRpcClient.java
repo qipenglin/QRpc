@@ -70,6 +70,7 @@ public class BioRpcClient extends AbstractRpcClient {
 
     @Override
     public RpcResponse invokeRpc(RpcRequest request, int timeout) {
+        log.info("BioRpcClient request:{}", request);
         RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
         if (!isConnected() || socket == null || socket.isClosed() || !socket.isConnected()) {
             connect(serverInfo);

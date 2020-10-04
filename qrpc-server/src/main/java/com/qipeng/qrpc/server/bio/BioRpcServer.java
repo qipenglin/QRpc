@@ -91,6 +91,7 @@ public class BioRpcServer implements RpcServer {
     }
 
     private void invokeRpc(RpcRequest request, Socket socket) {
+        log.info("BioRpcServer request:{}", request);
         RpcResponse response = RpcInvoker.invoke(request);
         serverThreadPool.submit(() -> {
             try {
