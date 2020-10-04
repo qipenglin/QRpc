@@ -34,10 +34,10 @@ public class BioRpcServer implements RpcServer {
     private volatile static BioRpcServer instance;
 
     private BioRpcServer() {
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("BioServerThread-{}")
-                                                                      .build();
+        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("BioRpcServer-%d")
+                .build();
         serverThreadPool = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
-                                                  new ArrayBlockingQueue<>(10000), threadFactory);
+                new ArrayBlockingQueue<>(10000), threadFactory);
     }
 
     public static BioRpcServer getInstance() {
@@ -58,10 +58,11 @@ public class BioRpcServer implements RpcServer {
             serverSocket = new ServerSocket(serverInfo.getPort());
             log.info("BioRpcServer启动成功:serverInfo:{}", serverInfo);
             isActivated = true;
-        } catch (IOException e) {
-            throw new RpcException("启动RpcServer失败:" + serverInfo, e);
+            serverThreadPool.execute(this::accept);
+        } catch (Exception e) {
+            throw new RpcException("启动BioRpcServer失败:" + serverInfo, e);
         }
-        serverThreadPool.execute(this::accept);
+
     }
 
     private void accept() {
@@ -69,34 +70,38 @@ public class BioRpcServer implements RpcServer {
             try {
                 Socket socket = serverSocket.accept();
                 log.info("客户端已连接,remoteAddress:{}", socket.getInetAddress());
-                serverThreadPool.execute(() -> listen(socket));
+                serverThreadPool.execute(() -> read(socket));
             } catch (Exception e) {
-                log.error("accept失败", e);
+                log.error("BioRpcServer accept 发生异常", e);
             }
         }
     }
 
-    private void listen(Socket socket) {
-        while (isActivated && socket != null && !socket.isClosed()) {
-            RpcRequest request;
+    private void read(Socket socket) {
+        while (isActivated && socket != null && socket.isConnected() && !socket.isClosed()) {
             try {
-                request = SocketReader.readRpcPacket(socket, RpcRequest.class);
-            } catch (IOException e) {
+                RpcRequest request = SocketReader.readRpcPacket(socket, RpcRequest.class);
+                serverThreadPool.submit(() -> invokeRpc(request, socket));
+            } catch (Exception e) {
+                log.error("BioRpcServer listenAndRead 发生异常", e);
                 break;
             }
-            serverThreadPool.submit(() -> {
-                RpcResponse response = RpcInvoker.invoke(request);
-                byte[] bytes = RpcPacketSerializer.serialize(response);
-                try {
-                    socket.getOutputStream().write(bytes);
-                    socket.getOutputStream().flush();
-                } catch (IOException e) {
-                    log.error("socket写数据失败");
-                    IOUtils.closeQuietly(socket, null);
-                }
-            });
         }
         IOUtils.closeQuietly(socket, null);
+    }
+
+    private void invokeRpc(RpcRequest request, Socket socket) {
+        RpcResponse response = RpcInvoker.invoke(request);
+        serverThreadPool.submit(() -> {
+            try {
+                byte[] bytes = RpcPacketSerializer.serialize(response);
+                socket.getOutputStream().write(bytes);
+                socket.getOutputStream().flush();
+            } catch (Exception e) {
+                log.error("BioRpcServer write 发生异常", e);
+                IOUtils.closeQuietly(socket, null);
+            }
+        });
     }
 
 }

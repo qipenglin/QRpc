@@ -11,6 +11,7 @@ import com.qipeng.qrpc.server.RpcInvoker;
 import com.qipeng.qrpc.server.RpcServer;
 import com.qipeng.qrpc.server.bio.BioRpcServer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.io.IOException;
@@ -37,15 +38,13 @@ public class NioRpcServer implements RpcServer {
     private volatile boolean isActivated;
     private ServerSocketChannel channel;
     private Selector selector;
-    private final ThreadPoolExecutor listenThreadPool;
-    private final ThreadPoolExecutor rwThreadPool;
+    private final ExecutorService ioThreadPool;
     private final ThreadPoolExecutor invokeTheadPool;
     private volatile static NioRpcServer instance;
 
     private NioRpcServer() {
-        ThreadFactory tf = new BasicThreadFactory.Builder().namingPattern("NioServerThread-{}").build();
-        listenThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, tf);
-        rwThreadPool = new ThreadPoolExecutor(4, 8, 100L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000), tf);
+        ThreadFactory tf = new BasicThreadFactory.Builder().namingPattern("NioServerThread-%d").build();
+        ioThreadPool = Executors.newSingleThreadExecutor(tf);
         invokeTheadPool = new ThreadPoolExecutor(10, 100, 1000L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000), tf);
     }
 
@@ -74,17 +73,17 @@ public class NioRpcServer implements RpcServer {
             channel.configureBlocking(false);
             channel.register(selector, SelectionKey.OP_ACCEPT);
             isActivated = true;
-            listenThreadPool.submit(this::listen);
+            ioThreadPool.submit(this::listen);
             log.info("NioRpcServer 启动成功，port:{}", serverInfo.getPort());
         } catch (IOException e) {
-            throw new RpcException("启动服务器失败", e);
+            throw new RpcException("NioRpcServer start 发生异常", e);
         }
     }
 
     private void listen() {
-        try {
-            while (isActivated) {
-                selector.select(100);
+        while (isActivated) {
+            try {
+                selector.select(1000);
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
                     SelectionKey sk = iterator.next();
@@ -95,10 +94,9 @@ public class NioRpcServer implements RpcServer {
                         read(sk);
                     }
                 }
+            } catch (Exception e) {
+                log.error("NioServer listen exception", e);
             }
-        } catch (Exception e) {
-            log.error("NioServer listen exception", e);
-            this.listen();
         }
     }
 
@@ -109,7 +107,7 @@ public class NioRpcServer implements RpcServer {
             sc.register(selector, SelectionKey.OP_READ);
             log.info("NioRpcServer收到客户端连接请求,remoteAddress:{}", sc.getRemoteAddress());
         } catch (IOException e) {
-            throw new RpcException();
+            log.error("NioRpcServer accept 发生异常", e);
         }
     }
 
@@ -123,19 +121,22 @@ public class NioRpcServer implements RpcServer {
                 invokeTheadPool.submit(() -> invokeRpc(request, sk));
             }
         } catch (Exception e) {
-            log.error("处理数据失败", e);
+            log.error("NioRpcServer read 发生异常", e);
             sk.cancel();
+            IOUtils.closeQuietly(sk.channel(), null);
         }
     }
 
     private void invokeRpc(RpcRequest request, SelectionKey sk) {
         RpcResponse response = RpcInvoker.invoke(request);
-        byte[] bytes = RpcPacketSerializer.serialize(response);
-        rwThreadPool.execute(() -> {
+        ioThreadPool.execute(() -> {
             try {
+                byte[] bytes = RpcPacketSerializer.serialize(response);
                 ((SocketChannel) sk.channel()).write(ByteBuffer.wrap(bytes));
-            } catch (IOException e) {
-                throw new RpcException("执行Rpc失败", e);
+            } catch (Exception e) {
+                log.error("NioRpcServer write 发生异常", e);
+                sk.cancel();
+                IOUtils.closeQuietly(sk.channel(), null);
             }
         });
     }

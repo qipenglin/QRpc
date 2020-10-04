@@ -49,7 +49,7 @@ public class NioRpcClient extends AbstractRpcClient {
         } catch (IOException e) {
             throw new RpcException("初始化selector失败", e);
         }
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("NioRpcClientThread-{}").build();
+        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("NioRpcClient%d").build();
         clientExecutor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10000), threadFactory);
         clientExecutor.execute(NioRpcClient::listen);
