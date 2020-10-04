@@ -29,7 +29,7 @@ public class RpcFuture {
     private final Long start;
 
     @Setter
-    private RpcResponse response;
+    private volatile RpcResponse response;
 
     public RpcFuture(Integer requestId, int timeout) {
         this.requestId = requestId;
@@ -49,7 +49,7 @@ public class RpcFuture {
         }
         futureMap.remove(requestId);
         if (response == null) {
-            throw new RpcException("time out");
+            throw new RpcException("rpc time out");
         }
         return response;
     }

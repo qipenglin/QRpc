@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -48,28 +47,8 @@ public class BioRpcClient extends AbstractRpcClient {
             this.socket = socket;
             setConnected(true);
             clientExecutor.submit(() -> listen(socket));
-        } catch (IOException e) {
-            throw new RpcException("BioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
-        }
-    }
-
-    @Override
-    public RpcResponse invokeRpc(RpcRequest request, int timeout) {
-        RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
-        if (!isConnected() || socket == null || !socket.isClosed()) {
-            connect(serverInfo);
-        }
-        byte[] bytes = RpcPacketSerializer.serialize(request);
-        try {
-            OutputStream outputStream = socket.getOutputStream();
-            outputStream.write(bytes);
-            outputStream.flush();
-            return future.get();
         } catch (Exception e) {
-            IOUtils.closeQuietly(socket, null);
-            socket = null;
-            setConnected(false);
-            throw new RpcException("BioRpcClient写数据失败,serverInfo:" + serverInfo, e);
+            throw new RpcException("BioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
         }
     }
 
@@ -82,10 +61,30 @@ public class BioRpcClient extends AbstractRpcClient {
                     future.setResponse(response);
                     future.getLatch().countDown();
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 IOUtils.closeQuietly(socket, null);
                 break;
             }
         }
     }
+
+    @Override
+    public RpcResponse invokeRpc(RpcRequest request, int timeout) {
+        RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
+        if (!isConnected() || socket == null || socket.isClosed() || !socket.isConnected()) {
+            connect(serverInfo);
+        }
+        try {
+            byte[] bytes = RpcPacketSerializer.serialize(request);
+            OutputStream outputStream = socket.getOutputStream();
+            outputStream.write(bytes);
+            outputStream.flush();
+        } catch (Exception e) {
+            setConnected(false);
+            IOUtils.closeQuietly(socket, null);
+            throw new RpcException("BioRpcClient写数据失败,serverInfo:" + serverInfo, e);
+        }
+        return future.get();
+    }
+
 }

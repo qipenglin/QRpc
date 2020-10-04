@@ -16,8 +16,8 @@ public class SocketReader {
     public static <T extends RpcPacket> T readRpcPacket(Socket socket, Class<T> clazz) throws IOException {
         InputStream inputStream = socket.getInputStream();
         checkMagicNum(inputStream);
-        Serializer serializer = parseSerializer(inputStream);
         checkPacketType(inputStream, clazz);
+        Serializer serializer = parseSerializer(inputStream);
         int len = parseLength(inputStream);
         byte[] bytes = getBody(inputStream, len);
         RpcPacket packet;

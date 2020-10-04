@@ -34,8 +34,8 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
         if (magicNum != MAGIC_NUM) {
             throw new RuntimeException("包格式不符合规定");
         }
-        Byte serializerType = byteBuf.readByte();
         Byte packetType = byteBuf.readByte();
+        Byte serializerType = byteBuf.readByte();
         int length = byteBuf.readInt();
         byte[] bytes = new byte[length];
         byteBuf.readBytes(bytes);
@@ -48,8 +48,8 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
     protected void encode(ChannelHandlerContext ctx, RpcPacket packet, ByteBuf byteBuf) {
         Serializer serializer = SerializerFactory.getSerializer();
         byteBuf.writeByte(MAGIC_NUM);
-        byteBuf.writeByte(serializer.getSerializerAlgorithm());
         byteBuf.writeByte(packet.getPacketType());
+        byteBuf.writeByte(serializer.getSerializerAlgorithm());
         byte[] bytes = serializer.serialize(packet);
         byteBuf.writeInt(bytes.length);
         byteBuf.writeBytes(bytes);
