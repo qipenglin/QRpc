@@ -27,7 +27,7 @@ public class BioRpcClient extends AbstractRpcClient {
 
     static {
         ThreadFactory threadFactory = new BasicThreadFactory.Builder()
-                .namingPattern("BioRpcClient%d").build();
+                .namingPattern("BioRpcClient-%d").build();
         clientExecutor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(10000), threadFactory);
     }
@@ -53,7 +53,7 @@ public class BioRpcClient extends AbstractRpcClient {
     }
 
     private void listen(Socket socket) {
-        while (isConnected() && !socket.isClosed()) {
+        while (isConnected() && socket.isConnected() && !socket.isClosed()) {
             try {
                 RpcResponse response = SocketReader.readRpcPacket(socket, RpcResponse.class);
                 RpcFuture future = RpcFuture.futureMap.get(response.getRequestId());

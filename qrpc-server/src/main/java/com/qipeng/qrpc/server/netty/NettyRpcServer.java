@@ -5,12 +5,7 @@ import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
 import com.qipeng.qrpc.server.RpcServer;
 import com.qipeng.qrpc.server.bio.BioRpcServer;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -25,8 +20,10 @@ public class NettyRpcServer implements RpcServer {
      */
     private volatile boolean isActivated;
     private volatile static NettyRpcServer instance;
+
     private NettyRpcServer() {
     }
+
     public static NettyRpcServer getInstance() {
         if (instance == null) {
             synchronized (BioRpcServer.class) {
@@ -38,6 +35,7 @@ public class NettyRpcServer implements RpcServer {
         }
         return instance;
     }
+
     public void start(ServerInfo serverInfo) {
         if (isActivated) {
             return;
@@ -66,14 +64,14 @@ public class NettyRpcServer implements RpcServer {
         bootstrap.option(ChannelOption.TCP_NODELAY, true);
         // 绑定ip和端口，并启动netty
         try {
-            bootstrap.bind(serverInfo.getHost(), serverInfo.getPort()).sync()
-                     .addListener(new ChannelFutureListener() {
-                         @Override
-                         public void operationComplete(ChannelFuture future) throws Exception {
-                             log.info("netty启动成功");
-                             isActivated = true;
-                         }
-                     });
+            bootstrap.bind(serverInfo.getPort()).sync()
+                    .addListener(new ChannelFutureListener() {
+                        @Override
+                        public void operationComplete(ChannelFuture future) throws Exception {
+                            log.info("netty启动成功");
+                            isActivated = true;
+                        }
+                    });
         } catch (Exception e) {
             log.error("绑定ip和端口，并启动netty，失败", e);
         }

@@ -19,7 +19,7 @@ public class NettyRpcRequestHandler extends SimpleChannelInboundHandler<RpcReque
     private static final ThreadPoolExecutor invokeExecutor;
 
     static {
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("invokeExecutor-{}").build();
+        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("NettyRequestHandler-%d").build();
         invokeExecutor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
                                                 new ArrayBlockingQueue<>(10000), threadFactory);
     }

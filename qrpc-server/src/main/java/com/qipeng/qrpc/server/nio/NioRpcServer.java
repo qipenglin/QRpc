@@ -38,13 +38,15 @@ public class NioRpcServer implements RpcServer {
     private volatile boolean isActivated;
     private ServerSocketChannel channel;
     private Selector selector;
-    private final ExecutorService ioThreadPool;
+    private final ExecutorService listenThreadPool;
+    private final ExecutorService writeThreadPool;
     private final ThreadPoolExecutor invokeTheadPool;
     private volatile static NioRpcServer instance;
 
     private NioRpcServer() {
         ThreadFactory tf = new BasicThreadFactory.Builder().namingPattern("NioServerThread-%d").build();
-        ioThreadPool = Executors.newSingleThreadExecutor(tf);
+        listenThreadPool = Executors.newSingleThreadExecutor(tf);
+        writeThreadPool = Executors.newSingleThreadExecutor(tf);
         invokeTheadPool = new ThreadPoolExecutor(10, 100, 1000L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000), tf);
     }
 
@@ -73,7 +75,7 @@ public class NioRpcServer implements RpcServer {
             channel.configureBlocking(false);
             channel.register(selector, SelectionKey.OP_ACCEPT);
             isActivated = true;
-            ioThreadPool.submit(this::listen);
+            listenThreadPool.submit(this::listen);
             log.info("NioRpcServer 启动成功，port:{}", serverInfo.getPort());
         } catch (IOException e) {
             throw new RpcException("NioRpcServer start 发生异常", e);
@@ -129,7 +131,7 @@ public class NioRpcServer implements RpcServer {
 
     private void invokeRpc(RpcRequest request, SelectionKey sk) {
         RpcResponse response = RpcInvoker.invoke(request);
-        ioThreadPool.execute(() -> {
+        writeThreadPool.execute(() -> {
             try {
                 byte[] bytes = RpcPacketSerializer.serialize(response);
                 ((SocketChannel) sk.channel()).write(ByteBuffer.wrap(bytes));
