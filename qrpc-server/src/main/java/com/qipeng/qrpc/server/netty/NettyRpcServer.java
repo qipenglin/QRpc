@@ -41,8 +41,8 @@ public class NettyRpcServer implements RpcServer {
             return;
         }
         log.info("尝试启动server: {}", serverInfo);
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        EventLoopGroup workerGroup = new NioEventLoopGroup(1);
         ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(bossGroup, workerGroup); // 将boss组和worker组绑定在Netty上下文里
         bootstrap.channel(NioServerSocketChannel.class); // 设置底层Channel

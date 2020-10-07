@@ -23,6 +23,7 @@ public class NioDataReader {
                 n--;
             }
         } catch (Exception e) {
+            sk.cancel();
             IOUtils.closeQuietly(channel, null);
             throw new RpcException("NIO从channel读取数据失败", e);
         }

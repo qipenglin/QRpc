@@ -55,6 +55,6 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
         byte[] bytes = serializer.serialize(packet);
         byteBuf.writeInt(bytes.length);
         byteBuf.writeBytes(bytes);
-        log.info("NettyRpcClient request:{}", packet);
+        log.info("PacketCodecHandler packet:{}", packet);
     }
 }
