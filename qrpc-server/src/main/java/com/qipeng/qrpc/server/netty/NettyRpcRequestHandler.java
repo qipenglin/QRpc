@@ -7,35 +7,19 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @ChannelHandler.Sharable
 public class NettyRpcRequestHandler extends SimpleChannelInboundHandler<RpcRequest> {
-
-    private static final ThreadPoolExecutor invokeExecutor;
-
-    static {
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("NettyRequestHandler-%d").build();
-        invokeExecutor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(10000), threadFactory);
-    }
 
     public NettyRpcRequestHandler() {
         super();
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RpcRequest request) throws Exception {
-        invokeExecutor.submit(() -> {
-            log.info("NettyRpcServer request:{}", request);
-            RpcResponse response = RpcInvoker.invoke(request);
-            ctx.channel().writeAndFlush(response);
-        });
+    protected void channelRead0(ChannelHandlerContext ctx, RpcRequest request) {
+        log.info("NettyRpcServer request:{}", request);
+        RpcResponse response = RpcInvoker.invoke(request);
+        ctx.channel().writeAndFlush(response);
     }
 }

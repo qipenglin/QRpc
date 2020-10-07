@@ -5,7 +5,13 @@ import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
 import com.qipeng.qrpc.server.RpcServer;
 import com.qipeng.qrpc.server.bio.BioRpcServer;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.DefaultEventLoopGroup;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -41,10 +47,10 @@ public class NettyRpcServer implements RpcServer {
             return;
         }
         log.info("尝试启动server: {}", serverInfo);
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup(1);
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
         ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(bossGroup, workerGroup); // 将boss组和worker组绑定在Netty上下文里
+        bootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup());
         bootstrap.channel(NioServerSocketChannel.class); // 设置底层Channel
         bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
@@ -52,7 +58,7 @@ public class NettyRpcServer implements RpcServer {
                 ChannelPipeline pipeline = channel.pipeline();
                 pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
                 pipeline.addLast(new PacketCodecHandler());
-                pipeline.addLast(new NettyRpcRequestHandler());
+                pipeline.addLast(new DefaultEventLoopGroup(), new NettyRpcRequestHandler());
                 pipeline.addLast(new IdleStateHandler(5, 0, 0));
                 pipeline.addLast(new NettyServerHeartBeatHandler());
             }
