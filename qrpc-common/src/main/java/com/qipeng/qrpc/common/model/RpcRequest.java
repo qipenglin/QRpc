@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @EqualsAndHashCode(callSuper = true)
 public class RpcRequest extends RpcPacket {
 
-    private static AtomicInteger requestIdSeed = new AtomicInteger(0);
+    private final static AtomicInteger requestIdSeed = new AtomicInteger(0);
 
     private Integer requestId;
     /**
@@ -30,8 +30,7 @@ public class RpcRequest extends RpcPacket {
     private Object[] parameters;
 
     public RpcRequest() {
-        super();
-        setRequestId(requestIdSeed.addAndGet(1));
+        this.requestId = requestIdSeed.addAndGet(1);
     }
 
     @Override

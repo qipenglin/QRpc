@@ -40,40 +40,43 @@ public class NettyRpcClient extends AbstractRpcClient {
 
     private void initBootstrap() {
         bootstrap = new Bootstrap();
-        bootstrap.group(workerGroup);
-        bootstrap.channel(NioSocketChannel.class);
-        bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-            @Override
-            protected void initChannel(SocketChannel ch) throws Exception {
-                // 获取channel中的pipeline
-                ChannelPipeline pipeline = ch.pipeline();
-                pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
-                pipeline.addLast(new PacketCodecHandler());
-                pipeline.addLast(new NettyRpcResponseHandler());
-                pipeline.addLast(new IdleStateHandler(0, 4, 0));
-                pipeline.addLast(new NettyClientHeartBeatHandler());
-            }
-
-            @Override
-            public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                super.channelInactive(ctx);
-                connect(serverInfo);
-            }
-        });
+        bootstrap.group(workerGroup)
+                 .channel(NioSocketChannel.class)
+                 .handler(new ChannelInitializer<SocketChannel>() {
+                     @Override
+                     protected void initChannel(SocketChannel ch) throws Exception {
+                         // 获取channel中的pipeline
+                         ChannelPipeline pipeline = ch.pipeline();
+                         pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
+                         pipeline.addLast(new PacketCodecHandler());
+                         pipeline.addLast(new NettyRpcResponseHandler());
+                         pipeline.addLast(new IdleStateHandler(0, 60, 0));
+                         pipeline.addLast(new NettyClientHeartBeatTrigger());
+                     }
+                     @Override
+                     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+                         super.channelInactive(ctx);
+                         doConnect(serverInfo);
+                     }
+                 });
     }
 
     public RpcResponse invokeRpc(RpcRequest request, int timeout) {
-        RpcFuture rpcFuture = new RpcFuture(request.getRequestId(), timeout);
+        RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
+        if (!isConnected() || channel == null || !channel.isActive()) {
+            doConnect(serverInfo);
+        }
         channel.writeAndFlush(request);
-        return rpcFuture.get();
+        return future.get();
     }
 
     protected void doConnect(ServerInfo serverInfo) {
         try {
-            ChannelFuture channelFuture = bootstrap.connect(new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort())).sync();
+            InetSocketAddress remoteAddress = new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort());
+            ChannelFuture channelFuture = bootstrap.connect(remoteAddress).sync();
             channel = channelFuture.channel();
             setConnected(true);
-            log.info("启动netty客户端成功，serverInfo: {}", serverInfo);
+            log.info("NettyRpcClient连接成功，serverInfo: {}", serverInfo);
         } catch (InterruptedException e) {
             throw new RpcException("netty客户端连接服务器失败，serverParam:" + serverInfo, e);
         }

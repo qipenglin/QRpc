@@ -12,7 +12,7 @@ import io.netty.handler.timeout.IdleStateEvent;
  * @date 2019-09-10 11:46
  **/
 @ChannelHandler.Sharable
-public class NettyClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
+public class NettyClientHeartBeatTrigger extends ChannelInboundHandlerAdapter {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {

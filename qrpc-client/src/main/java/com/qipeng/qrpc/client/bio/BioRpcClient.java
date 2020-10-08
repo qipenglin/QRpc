@@ -73,7 +73,7 @@ public class BioRpcClient extends AbstractRpcClient {
         log.info("BioRpcClient request:{}", request);
         RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
         if (!isConnected() || socket == null || socket.isClosed() || !socket.isConnected()) {
-            connect(serverInfo);
+            doConnect(serverInfo);
         }
         try {
             byte[] bytes = RpcPacketSerializer.serialize(request);
