@@ -9,7 +9,6 @@ import com.qipeng.qrpc.common.nio.NioDataReader;
 import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
 import com.qipeng.qrpc.server.RpcInvoker;
 import com.qipeng.qrpc.server.RpcServer;
-import com.qipeng.qrpc.server.bio.BioRpcServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -22,7 +21,14 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
-import java.util.concurrent.*;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Company: www.vivo.com
@@ -34,25 +40,23 @@ import java.util.concurrent.*;
  */
 @Slf4j
 public class SimpleNioRpcServer implements RpcServer {
-
     private volatile boolean isActivated;
-    private ServerSocketChannel channel;
+    private ServerSocketChannel serverSocketChannel;
     private Selector selector;
+    private static final Queue<SocketChannel> channelQueue = new LinkedBlockingDeque<>();
     private final ExecutorService listenThreadPool;
-    private final ExecutorService writeThreadPool;
     private final ThreadPoolExecutor invokeTheadPool;
     private volatile static SimpleNioRpcServer instance;
 
     private SimpleNioRpcServer() {
         ThreadFactory tf = new BasicThreadFactory.Builder().namingPattern("NioServerThread-%d").build();
         listenThreadPool = Executors.newSingleThreadExecutor(tf);
-        writeThreadPool = Executors.newSingleThreadExecutor(tf);
         invokeTheadPool = new ThreadPoolExecutor(10, 100, 1000L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000), tf);
     }
 
     public static SimpleNioRpcServer getInstance() {
         if (instance == null) {
-            synchronized (BioRpcServer.class) {
+            synchronized (SimpleNioRpcServer.class) {
                 if (instance == null) {
                     instance = new SimpleNioRpcServer();
                     return instance;
@@ -69,11 +73,11 @@ public class SimpleNioRpcServer implements RpcServer {
         }
         try {
             InetSocketAddress address = new InetSocketAddress(serverInfo.getPort());
-            channel = ServerSocketChannel.open();
+            serverSocketChannel = ServerSocketChannel.open();
             selector = Selector.open();
-            channel.bind(address);
-            channel.configureBlocking(false);
-            channel.register(selector, SelectionKey.OP_ACCEPT);
+            serverSocketChannel.bind(address);
+            serverSocketChannel.configureBlocking(false);
+            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
             isActivated = true;
             listenThreadPool.submit(this::listen);
             log.info("NioRpcServer 启动成功，port:{}", serverInfo.getPort());
@@ -83,15 +87,22 @@ public class SimpleNioRpcServer implements RpcServer {
     }
 
     private void listen() {
-        while (isActivated) {
+        while (isActivated && selector.isOpen()) {
             try {
-                selector.select(1000);
+                if (!channelQueue.isEmpty()) {
+                    SocketChannel channel = channelQueue.poll();
+                    channel.register(selector, SelectionKey.OP_READ);
+                }
+                selector.select(10);
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
                     SelectionKey sk = iterator.next();
                     iterator.remove();
                     if (sk.isAcceptable()) {
-                        accept();
+                        SocketChannel sc = serverSocketChannel.accept();
+                        sc.configureBlocking(false);
+                        channelQueue.add(sc);
+                        log.info("NioRpcServer收到客户端连接请求,remoteAddress:{}", sc.getRemoteAddress());
                     } else if (sk.isReadable()) {
                         read(sk);
                     }
@@ -99,17 +110,6 @@ public class SimpleNioRpcServer implements RpcServer {
             } catch (Exception e) {
                 log.error("NioServer listen exception", e);
             }
-        }
-    }
-
-    private void accept() {
-        try {
-            SocketChannel sc = channel.accept();
-            sc.configureBlocking(false);
-            sc.register(selector, SelectionKey.OP_READ);
-            log.info("NioRpcServer收到客户端连接请求,remoteAddress:{}", sc.getRemoteAddress());
-        } catch (IOException e) {
-            log.error("NioRpcServer accept 发生异常", e);
         }
     }
 
@@ -132,15 +132,13 @@ public class SimpleNioRpcServer implements RpcServer {
     private void invokeRpc(RpcRequest request, SelectionKey sk) {
         log.info("NioRpcServer request:{}", request);
         RpcResponse response = RpcInvoker.invoke(request);
-        writeThreadPool.execute(() -> {
-            try {
-                byte[] bytes = RpcPacketSerializer.serialize(response);
-                ((SocketChannel) sk.channel()).write(ByteBuffer.wrap(bytes));
-            } catch (Exception e) {
-                log.error("NioRpcServer write 发生异常", e);
-                sk.cancel();
-                IOUtils.closeQuietly(sk.channel(), null);
-            }
-        });
+        try {
+            byte[] bytes = RpcPacketSerializer.serialize(response);
+            ((SocketChannel) sk.channel()).write(ByteBuffer.wrap(bytes));
+        } catch (Exception e) {
+            log.error("NioRpcServer write 发生异常", e);
+            sk.cancel();
+            IOUtils.closeQuietly(sk.channel(), null);
+        }
     }
 }

@@ -20,7 +20,8 @@ public class HelloServiceImpl implements HelloService {
     @Override
     public TestResponse sayHello() {
         TestRequest request = new TestRequest();
-        String name = RandomStringUtils.randomAlphabetic(ThreadLocalRandom.current().nextInt(1, 20));
+        int count = ThreadLocalRandom.current().nextInt(1, 20);
+        String name = RandomStringUtils.randomAlphabetic(count);
         request.setName(name);
         TestResponse response = testService.test(request);
         log.info("request:{},response:{}", request, response);

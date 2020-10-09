@@ -19,7 +19,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
@@ -27,7 +26,6 @@ import java.net.InetSocketAddress;
 @Slf4j
 public class NettyRpcClient extends AbstractRpcClient {
     private static final EventLoopGroup workerGroup = new NioEventLoopGroup();
-    @Getter
     private final ServerInfo serverInfo;
     private Bootstrap bootstrap;
     private Channel channel;
@@ -44,7 +42,7 @@ public class NettyRpcClient extends AbstractRpcClient {
                  .channel(NioSocketChannel.class)
                  .handler(new ChannelInitializer<SocketChannel>() {
                      @Override
-                     protected void initChannel(SocketChannel ch) throws Exception {
+                     protected void initChannel(SocketChannel ch) {
                          // 获取channel中的pipeline
                          ChannelPipeline pipeline = ch.pipeline();
                          pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
@@ -53,12 +51,26 @@ public class NettyRpcClient extends AbstractRpcClient {
                          pipeline.addLast(new IdleStateHandler(0, 60, 0));
                          pipeline.addLast(new NettyClientHeartBeatTrigger());
                      }
+
                      @Override
                      public void channelInactive(ChannelHandlerContext ctx) throws Exception {
                          super.channelInactive(ctx);
                          doConnect(serverInfo);
                      }
                  });
+    }
+
+    protected void doConnect(ServerInfo serverInfo) {
+        try {
+            InetSocketAddress remoteAddress = new InetSocketAddress(serverInfo.getHost(),
+                                                                    serverInfo.getPort());
+            ChannelFuture channelFuture = bootstrap.connect(remoteAddress).sync();
+            channel = channelFuture.channel();
+            setConnected(true);
+            log.info("NettyRpcClient连接成功，serverInfo: {}", serverInfo);
+        } catch (InterruptedException e) {
+            throw new RpcException("netty客户端连接服务器失败，serverParam:" + serverInfo, e);
+        }
     }
 
     public RpcResponse invokeRpc(RpcRequest request, int timeout) {
@@ -68,18 +80,6 @@ public class NettyRpcClient extends AbstractRpcClient {
         }
         channel.writeAndFlush(request);
         return future.get();
-    }
-
-    protected void doConnect(ServerInfo serverInfo) {
-        try {
-            InetSocketAddress remoteAddress = new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort());
-            ChannelFuture channelFuture = bootstrap.connect(remoteAddress).sync();
-            channel = channelFuture.channel();
-            setConnected(true);
-            log.info("NettyRpcClient连接成功，serverInfo: {}", serverInfo);
-        } catch (InterruptedException e) {
-            throw new RpcException("netty客户端连接服务器失败，serverParam:" + serverInfo, e);
-        }
     }
 }
 

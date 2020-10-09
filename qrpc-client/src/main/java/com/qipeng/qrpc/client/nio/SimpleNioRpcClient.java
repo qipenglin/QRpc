@@ -12,7 +12,6 @@ import com.qipeng.qrpc.common.serialize.RpcPacketSerializer;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -20,13 +19,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Company: www.vivo.com
@@ -38,9 +35,11 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class SimpleNioRpcClient extends AbstractRpcClient {
+    private static final Queue<SocketChannel> channelQueue = new LinkedBlockingDeque<>();
+    private static final ExecutorService listenExecutor = Executors.newSingleThreadExecutor();
+    private static volatile boolean listenStarted;
     private static final Selector selector;
-    private static final ThreadPoolExecutor clientExecutor;
-    private volatile static Set<SocketChannel> toBeRegisteredChannel = new HashSet<>();
+
     @Getter
     private final ServerInfo serverInfo;
     private SocketChannel channel;
@@ -51,10 +50,6 @@ public class SimpleNioRpcClient extends AbstractRpcClient {
         } catch (Exception e) {
             throw new RpcException("NioRpcClient初始化selector失败", e);
         }
-        ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("NioRpcClient-%d").build();
-        clientExecutor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(10000), threadFactory);
-        clientExecutor.execute(SimpleNioRpcClient::listen);
     }
 
     public SimpleNioRpcClient(ServerInfo serverInfo) {
@@ -68,24 +63,31 @@ public class SimpleNioRpcClient extends AbstractRpcClient {
             InetSocketAddress serverAddress = new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort());
             channel = SocketChannel.open(serverAddress);
             channel.configureBlocking(false);
-            toBeRegisteredChannel.add(channel);
+            channelQueue.add(channel);
             setConnected(true);
+            if (!listenStarted) {
+                startListen();
+            }
         } catch (IOException e) {
             throw new RpcException("NioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
+        }
+    }
+
+    private synchronized void startListen() {
+        if (!listenStarted) {
+            listenExecutor.execute(SimpleNioRpcClient::listen);
+            listenStarted = true;
         }
     }
 
     private static void listen() {
         while (selector.isOpen()) {
             try {
-                selector.select(1000);
-                if (!toBeRegisteredChannel.isEmpty()) {
-                    Set<SocketChannel> temp = toBeRegisteredChannel;
-                    toBeRegisteredChannel = new HashSet<>();
-                    for (SocketChannel c : temp) {
-                        c.register(selector, SelectionKey.OP_READ);
-                    }
+                if (!channelQueue.isEmpty()) {
+                    SocketChannel channel = channelQueue.poll();
+                    channel.register(selector, SelectionKey.OP_READ);
                 }
+                selector.select(20);
                 Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                 while (iterator.hasNext()) {
                     SelectionKey sk = iterator.next();
