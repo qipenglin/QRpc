@@ -3,6 +3,7 @@ package com.qipeng.qrpc.client;
 import com.qipeng.qrpc.client.bio.BioRpcClient;
 import com.qipeng.qrpc.client.netty.NettyRpcClient;
 import com.qipeng.qrpc.client.nio.NioRpcClient;
+import com.qipeng.qrpc.client.nio.SimpleNioRpcClient;
 import com.qipeng.qrpc.common.config.RpcConfig;
 import com.qipeng.qrpc.common.model.NetworkModel;
 import com.qipeng.qrpc.common.model.ServerInfo;
@@ -31,6 +32,9 @@ public class RpcClientFactory {
                         break;
                     case NIO:
                         client = new NioRpcClient(serverInfo);
+                        break;
+                    case SIMPLE_NIO:
+                        client = new SimpleNioRpcClient(serverInfo);
                         break;
                     case NETTY:
                     default:

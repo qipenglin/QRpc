@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -68,8 +67,9 @@ public class SimpleNioRpcClient extends AbstractRpcClient {
             if (!listenStarted) {
                 startListen();
             }
-        } catch (IOException e) {
-            throw new RpcException("NioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
+            log.info("SimpleNioRpcClient连接成功，serverInfo: {}", serverInfo);
+        } catch (Exception e) {
+            throw new RpcException("SimpleNioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
         }
     }
 
@@ -97,7 +97,7 @@ public class SimpleNioRpcClient extends AbstractRpcClient {
                     }
                 }
             } catch (Exception e) {
-                log.error("NioRpcClient listen 发生异常", e);
+                log.error("SimpleNioRpcClient listen 发生异常", e);
             }
         }
     }
@@ -118,7 +118,7 @@ public class SimpleNioRpcClient extends AbstractRpcClient {
 
     @Override
     public RpcResponse invokeRpc(RpcRequest request, int timeout) {
-        log.info("NioRpcClient request:{}", request);
+        log.info("SimpleNioRpcClient request:{}", request);
         RpcFuture future = new RpcFuture(request.getRequestId(), timeout);
         if (!isConnected() || channel == null || !channel.isConnected() || !channel.isOpen()) {
             doConnect(serverInfo);
@@ -129,7 +129,7 @@ public class SimpleNioRpcClient extends AbstractRpcClient {
         } catch (Exception e) {
             setConnected(false);
             IOUtils.closeQuietly(channel, null);
-            throw new RpcException("NioRpcClient写数据失败,serverInfo:" + serverInfo, e);
+            throw new RpcException("SimpleNioRpcClient写数据失败,serverInfo:" + serverInfo, e);
         }
         return future.get();
     }

@@ -47,6 +47,7 @@ public class BioRpcClient extends AbstractRpcClient {
             this.socket = socket;
             setConnected(true);
             clientExecutor.submit(() -> listen(socket));
+            log.info("BioRpcClient连接成功，serverInfo: {}", serverInfo);
         } catch (Exception e) {
             throw new RpcException("BioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
         }

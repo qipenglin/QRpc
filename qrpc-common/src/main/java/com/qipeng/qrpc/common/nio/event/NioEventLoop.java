@@ -50,7 +50,7 @@ public abstract class NioEventLoop {
                     taskQueue.poll().run();
                 }
                 select();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.error("NioEventLoop run error", e);
             }
         }

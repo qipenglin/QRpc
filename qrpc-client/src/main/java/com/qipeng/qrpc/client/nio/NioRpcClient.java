@@ -35,7 +35,7 @@ public class NioRpcClient extends AbstractRpcClient {
 
     public NioRpcClient(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
-        eventLoop = (NioClientEventLoop)eventLoopGroup.next();
+        eventLoop = (NioClientEventLoop) eventLoopGroup.next();
         connect(serverInfo);
     }
 
@@ -47,6 +47,7 @@ public class NioRpcClient extends AbstractRpcClient {
             channel.configureBlocking(false);
             eventLoop.register(channel, SelectionKey.OP_READ);
             setConnected(true);
+            log.info("NioRpcClient连接成功，serverInfo: {}", serverInfo);
         } catch (Exception e) {
             throw new RpcException("NioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
         }

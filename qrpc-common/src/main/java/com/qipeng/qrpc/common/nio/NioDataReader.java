@@ -3,6 +3,7 @@ package com.qipeng.qrpc.common.nio;
 import com.qipeng.qrpc.common.exception.RpcException;
 import org.apache.commons.io.IOUtils;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -28,7 +29,7 @@ public class NioDataReader {
             throw new RpcException("NIO从channel读取数据失败", e);
         }
         //buffer转换到读模式
-        buffer.flip();
+        ((Buffer)buffer).flip();
         while (buffer.remaining() >= 7) {
             int len = buffer.getInt(buffer.position() + 3);
             if (buffer.remaining() >= len + 7) {

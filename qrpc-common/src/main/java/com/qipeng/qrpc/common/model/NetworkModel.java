@@ -14,6 +14,7 @@ public enum NetworkModel {
     NETTY("netty"),
     BIO("bio"),
     NIO("nio"),
+    SIMPLE_NIO("simpleNio"),
     ;
 
     private final String name;

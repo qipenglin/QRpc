@@ -11,6 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,13 @@ public class PacketCodecHandler extends ByteToMessageCodec<RpcPacket> {
 
     public PacketCodecHandler() {
         super();
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        SocketAddress remoteAddress = ctx.channel().remoteAddress();
+        log.info("NettyRpcServer收到客户端连接 remoteAddress:{}", remoteAddress);
+        super.channelActive(ctx);
     }
 
     @Override
