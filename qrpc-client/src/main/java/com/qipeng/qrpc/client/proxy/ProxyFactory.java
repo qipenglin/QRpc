@@ -1,16 +1,12 @@
 package com.qipeng.qrpc.client.proxy;
 
-import com.qipeng.qrpc.client.proxy.cglib.CglibRpcInterceptor;
-import com.qipeng.qrpc.client.proxy.jdkproxy.JdkProxyRpcInterceptor;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
-import org.springframework.cglib.proxy.Enhancer;
 
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ProxyFactory {
+public class ProxyFactory {
 
     private static final Map<RegistryConfig, Map<String, Object>> REGISTRY_PROXY_MAP = new HashMap<>();
 
@@ -18,7 +14,7 @@ public abstract class ProxyFactory {
         return getProxy(clazz, null);
     }
 
-    public static Object getProxy(Class<?> clazz, RegistryConfig registryConfig) {
+    public static <T> Object getProxy(Class<T> clazz, RegistryConfig registryConfig) {
         Map<String, Object> proxyMap;
         if ((proxyMap = REGISTRY_PROXY_MAP.get(registryConfig)) != null) {
             return getProxy(clazz, registryConfig, proxyMap);
@@ -29,7 +25,7 @@ public abstract class ProxyFactory {
         return getProxy(clazz, registryConfig, proxyMap);
     }
 
-    private static Object getProxy(Class<?> clazz, RegistryConfig registryConfig, Map<String, Object> proxyMap) {
+    private static <T> Object getProxy(Class<T> clazz, RegistryConfig registryConfig, Map<String, Object> proxyMap) {
         String className = clazz.getName();
         Object proxy = proxyMap.get(className);
         if (proxy != null) {
@@ -37,24 +33,15 @@ public abstract class ProxyFactory {
         }
         synchronized (ProxyFactory.class) {
             if (proxyMap.get(className) == null) {
-                proxy = doCreateCglibProxy(clazz, registryConfig);
+                proxy = doCreateProxy(clazz, registryConfig);
                 proxyMap.put(clazz.getName(), proxy);
             }
         }
         return proxyMap.get(className);
     }
 
-    protected abstract Object doCreateProxy(Class<?> clazz, RegistryConfig registryConfig);
-
-    private static Object doCreateCglibProxy(Class<?> clazz, RegistryConfig registryConfig) {
-        Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(clazz);
-        enhancer.setCallback(new CglibRpcInterceptor(registryConfig));
-        return enhancer.create();
-    }
-
-    private static Object doCreateJdkProxy(Class<?> clazz, RegistryConfig registryConfig) {
-        JdkProxyRpcInterceptor interceptor = new JdkProxyRpcInterceptor(registryConfig);
-        return Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, interceptor);
+    private static <T> Object doCreateProxy(Class<T> clazz, RegistryConfig registryConfig) {
+        ProxySource proxySource = ProxySourceFactory.getInstance();
+        return proxySource.createProxy(clazz, registryConfig);
     }
 }

@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({RpcConfig.class, RpcReferenceAnnotationPostProcessor.class})
+@Import({RpcConfig.class, RpcReferenceAnnotationPostProcessor.class, RpcReferenceAnnotationProcessor.class})
 public @interface EnableRpcClient {
 }

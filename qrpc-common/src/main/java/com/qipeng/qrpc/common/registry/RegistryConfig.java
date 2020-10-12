@@ -7,6 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class RegistryConfig {
 
-    private RegistryProtocol protocol;
-    private String address;
+    private final RegistryProtocol protocol;
+    private final String address;
 }
