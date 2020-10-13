@@ -5,7 +5,6 @@ import com.qipeng.qrpc.client.annotation.RpcReference;
 import com.qipeng.qrpc.client.proxy.ProxyFactory;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 

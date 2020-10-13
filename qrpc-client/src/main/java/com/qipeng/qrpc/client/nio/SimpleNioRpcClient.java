@@ -36,12 +36,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class SimpleNioRpcClient extends AbstractRpcClient {
     private static final Queue<SocketChannel> channelQueue = new LinkedBlockingDeque<>();
     private static final ExecutorService listenExecutor = Executors.newSingleThreadExecutor();
-    private static volatile boolean listenStarted;
     private static final Selector selector;
-
-    @Getter
-    private final ServerInfo serverInfo;
-    private SocketChannel channel;
+    private static volatile boolean listenStarted;
 
     static {
         try {
@@ -51,33 +47,13 @@ public class SimpleNioRpcClient extends AbstractRpcClient {
         }
     }
 
+    @Getter
+    private final ServerInfo serverInfo;
+    private SocketChannel channel;
+
     public SimpleNioRpcClient(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
         connect(serverInfo);
-    }
-
-    @Override
-    protected void doConnect(ServerInfo serverInfo) {
-        try {
-            InetSocketAddress serverAddress = new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort());
-            channel = SocketChannel.open(serverAddress);
-            channel.configureBlocking(false);
-            channelQueue.add(channel);
-            setConnected(true);
-            if (!listenStarted) {
-                startListen();
-            }
-            log.info("SimpleNioRpcClient连接成功，serverInfo: {}", serverInfo);
-        } catch (Exception e) {
-            throw new RpcException("SimpleNioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
-        }
-    }
-
-    private synchronized void startListen() {
-        if (!listenStarted) {
-            listenExecutor.execute(SimpleNioRpcClient::listen);
-            listenStarted = true;
-        }
     }
 
     private static void listen() {
@@ -113,6 +89,30 @@ public class SimpleNioRpcClient extends AbstractRpcClient {
                 future.setResponse(response);
                 future.getLatch().countDown();
             }
+        }
+    }
+
+    @Override
+    protected void doConnect(ServerInfo serverInfo) {
+        try {
+            InetSocketAddress serverAddress = new InetSocketAddress(serverInfo.getHost(), serverInfo.getPort());
+            channel = SocketChannel.open(serverAddress);
+            channel.configureBlocking(false);
+            channelQueue.add(channel);
+            setConnected(true);
+            if (!listenStarted) {
+                startListen();
+            }
+            log.info("SimpleNioRpcClient连接成功，serverInfo: {}", serverInfo);
+        } catch (Exception e) {
+            throw new RpcException("SimpleNioRpcClient连接服务器失败,serverInfo:" + serverInfo, e);
+        }
+    }
+
+    private synchronized void startListen() {
+        if (!listenStarted) {
+            listenExecutor.execute(SimpleNioRpcClient::listen);
+            listenStarted = true;
         }
     }
 

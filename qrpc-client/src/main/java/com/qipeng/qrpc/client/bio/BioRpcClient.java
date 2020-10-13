@@ -29,7 +29,7 @@ public class BioRpcClient extends AbstractRpcClient {
         ThreadFactory threadFactory = new BasicThreadFactory.Builder()
                 .namingPattern("BioRpcClient-%d").build();
         clientExecutor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(10000), threadFactory);
+                                                new ArrayBlockingQueue<>(10000), threadFactory);
     }
 
     @Getter

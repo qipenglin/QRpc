@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -22,22 +21,19 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class BioRpcServer implements RpcServer {
+    private volatile static BioRpcServer instance;
+    private final ThreadPoolExecutor serverThreadPool;
     /**
      * 服务端是否已经启动
      */
     private volatile boolean isActivated;
-
-    private final ThreadPoolExecutor serverThreadPool;
-
     private ServerSocket serverSocket;
-
-    private volatile static BioRpcServer instance;
 
     private BioRpcServer() {
         ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("BioRpcServer-%d")
-                .build();
+                                                                      .build();
         serverThreadPool = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(10000), threadFactory);
+                                                  new ArrayBlockingQueue<>(10000), threadFactory);
     }
 
     public static BioRpcServer getInstance() {

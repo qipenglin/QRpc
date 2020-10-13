@@ -29,7 +29,7 @@ public class NioDataReader {
             throw new RpcException("NIO从channel读取数据失败", e);
         }
         //buffer转换到读模式
-        ((Buffer)buffer).flip();
+        ((Buffer) buffer).flip();
         while (buffer.remaining() >= 7) {
             int len = buffer.getInt(buffer.position() + 3);
             if (buffer.remaining() >= len + 7) {

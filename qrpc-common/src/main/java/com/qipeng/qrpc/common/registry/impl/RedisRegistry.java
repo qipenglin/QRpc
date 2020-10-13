@@ -28,15 +28,14 @@ public class RedisRegistry extends AbstractRegistry {
 
     private static final ScheduledThreadPoolExecutor subscribeExecutor;
 
-    private final JedisPool jedisPool;
-
-    @Getter
-    private final Set<String> subscribedServices;
-
     static {
         subscribeExecutor = new ScheduledThreadPoolExecutor(1);
         subscribeExecutor.scheduleAtFixedRate(RedisRegistry::refreshServerInfo, 60, 60, TimeUnit.SECONDS);
     }
+
+    private final JedisPool jedisPool;
+    @Getter
+    private final Set<String> subscribedServices;
 
     private RedisRegistry(RegistryConfig config) {
         String address = config.getAddress();
@@ -53,6 +52,25 @@ public class RedisRegistry extends AbstractRegistry {
             registry = registryMap.computeIfAbsent(config, RedisRegistry::new);
             registryMap.put(config, registry);
             return registry;
+        }
+    }
+
+    private static void refreshServerInfo() {
+        try {
+            if (MapUtils.isEmpty(registryMap)) {
+                return;
+            }
+            for (RedisRegistry registry : registryMap.values()) {
+                if (!CollectionUtils.isEmpty(registry.getSubscribedServices())) {
+                    continue;
+                }
+                for (String serviceName : registry.getSubscribedServices()) {
+                    List<ServerInfo> serverInfos = registry.doGetServerParam(serviceName);
+                    registry.getServiceMap().put(serviceName, serverInfos);
+                }
+            }
+        } catch (Exception e) {
+            log.error("监听注册中心服务出现异常", e);
         }
     }
 
@@ -75,26 +93,6 @@ public class RedisRegistry extends AbstractRegistry {
     public void subscribe(String serviceName) {
         subscribedServices.add(serviceName);
     }
-
-    private static void refreshServerInfo() {
-        try {
-            if (MapUtils.isEmpty(registryMap)) {
-                return;
-            }
-            for (RedisRegistry registry : registryMap.values()) {
-                if (!CollectionUtils.isEmpty(registry.getSubscribedServices())) {
-                    continue;
-                }
-                for (String serviceName : registry.getSubscribedServices()) {
-                    List<ServerInfo> serverInfos = registry.doGetServerParam(serviceName);
-                    registry.getServiceMap().put(serviceName, serverInfos);
-                }
-            }
-        } catch (Exception e) {
-            log.error("监听注册中心服务出现异常", e);
-        }
-    }
-
 
     @Override
     public boolean registerService(String serviceName, ServerInfo serverInfo) {

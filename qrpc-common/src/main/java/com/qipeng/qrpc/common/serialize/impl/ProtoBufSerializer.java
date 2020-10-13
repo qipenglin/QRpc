@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ProtoBufSerializer implements Serializer {
 
-    private volatile static ProtoBufSerializer instance;
     /**
      * 避免每次序列化都重新申请Buffer空间
      */
@@ -21,6 +20,7 @@ public class ProtoBufSerializer implements Serializer {
      * 缓存Schema
      */
     private static final Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<>();
+    private volatile static ProtoBufSerializer instance;
 
     private ProtoBufSerializer() {
     }

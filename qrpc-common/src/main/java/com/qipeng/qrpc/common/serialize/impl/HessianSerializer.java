@@ -14,8 +14,10 @@ import java.io.IOException;
 public class HessianSerializer implements Serializer {
 
     private volatile static HessianSerializer instance;
+
     private HessianSerializer() {
     }
+
     public static HessianSerializer getInstance() {
         if (instance == null) {
             synchronized (HessianSerializer.class) {

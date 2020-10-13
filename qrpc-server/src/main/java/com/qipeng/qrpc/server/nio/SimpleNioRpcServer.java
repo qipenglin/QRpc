@@ -40,13 +40,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class SimpleNioRpcServer implements RpcServer {
+    private static final Queue<SocketChannel> channelQueue = new LinkedBlockingDeque<>();
+    private volatile static SimpleNioRpcServer instance;
+    private final ExecutorService listenThreadPool;
+    private final ThreadPoolExecutor invokeTheadPool;
     private volatile boolean isActivated;
     private ServerSocketChannel serverSocketChannel;
     private Selector selector;
-    private static final Queue<SocketChannel> channelQueue = new LinkedBlockingDeque<>();
-    private final ExecutorService listenThreadPool;
-    private final ThreadPoolExecutor invokeTheadPool;
-    private volatile static SimpleNioRpcServer instance;
 
     private SimpleNioRpcServer() {
         ThreadFactory tf = new BasicThreadFactory.Builder().namingPattern("NioServerThread-%d").build();

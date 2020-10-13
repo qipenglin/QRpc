@@ -11,13 +11,10 @@ import java.util.concurrent.LinkedBlockingDeque;
 @Slf4j
 public abstract class NioEventLoop {
 
-    private volatile boolean started;
-
     private final Executor executor;
-
-    protected Selector selector;
-
     private final Queue<Runnable> taskQueue;
+    protected Selector selector;
+    private volatile boolean started;
 
     public NioEventLoop() {
         this.executor = new ThreadPerTaskExecutor();

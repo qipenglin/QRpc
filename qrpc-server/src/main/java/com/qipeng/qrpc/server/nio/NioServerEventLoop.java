@@ -28,6 +28,10 @@ public class NioServerEventLoop extends NioEventLoop {
         invokeTheadPool = new ThreadPoolExecutor(10, 100, 1000L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000));
     }
 
+    public NioServerEventLoop() {
+        super();
+    }
+
     public static NioServerEventLoop[] group() {
         int n = Runtime.getRuntime().availableProcessors();
         return group(n);
@@ -40,10 +44,6 @@ public class NioServerEventLoop extends NioEventLoop {
             arr[i] = new NioServerEventLoop();
         }
         return arr;
-    }
-
-    public NioServerEventLoop() {
-        super();
     }
 
     @Override

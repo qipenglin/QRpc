@@ -3,7 +3,6 @@ package com.qipeng.qrpc.server.netty;
 import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.netty.codec.PacketCodecHandler;
 import com.qipeng.qrpc.server.RpcServer;
-import com.qipeng.qrpc.server.bio.BioRpcServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -23,8 +22,8 @@ public class NettyRpcServer implements RpcServer {
      */
     private static NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
     private static NioEventLoopGroup workerGroup = new NioEventLoopGroup();
-    private volatile boolean isActivated;
     private volatile static NettyRpcServer instance;
+    private volatile boolean isActivated;
 
     private NettyRpcServer() {
     }

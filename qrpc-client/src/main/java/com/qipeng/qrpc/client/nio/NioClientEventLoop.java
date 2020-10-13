@@ -14,6 +14,10 @@ import java.util.Iterator;
 @Slf4j
 public class NioClientEventLoop extends NioEventLoop {
 
+    public NioClientEventLoop() {
+        super();
+    }
+
     public static NioClientEventLoop[] group() {
         int n = Runtime.getRuntime().availableProcessors();
         return group(n);
@@ -28,8 +32,18 @@ public class NioClientEventLoop extends NioEventLoop {
         return arr;
     }
 
-    public NioClientEventLoop() {
-        super();
+    private static void read(SelectionKey sk) {
+        NioDataReader.readData(sk);
+        NioDataCache cache = (NioDataCache) sk.attachment();
+        while (cache != null && cache.isReady()) {
+            byte[] bytes = cache.getData();
+            RpcResponse response = RpcPacketSerializer.deserialize(bytes, RpcResponse.class);
+            RpcFuture future = RpcFuture.getFuture(response.getRequestId());
+            if (future != null) {
+                future.setResponse(response);
+                future.getLatch().countDown();
+            }
+        }
     }
 
     @Override
@@ -46,20 +60,6 @@ public class NioClientEventLoop extends NioEventLoop {
             }
         } catch (Exception e) {
             log.error("NioRpcClient listen 发生异常", e);
-        }
-    }
-
-    private static void read(SelectionKey sk) {
-        NioDataReader.readData(sk);
-        NioDataCache cache = (NioDataCache) sk.attachment();
-        while (cache != null && cache.isReady()) {
-            byte[] bytes = cache.getData();
-            RpcResponse response = RpcPacketSerializer.deserialize(bytes, RpcResponse.class);
-            RpcFuture future = RpcFuture.getFuture(response.getRequestId());
-            if (future != null) {
-                future.setResponse(response);
-                future.getLatch().countDown();
-            }
         }
     }
 }

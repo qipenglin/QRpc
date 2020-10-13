@@ -13,9 +13,9 @@ import java.nio.channels.ServerSocketChannel;
 @Slf4j
 public class NioRpcServer implements RpcServer {
 
+    private volatile static NioRpcServer instance;
     private ServerSocketChannel serverChannel;
     private volatile boolean isStarted;
-    private volatile static NioRpcServer instance;
 
     private NioRpcServer() {
     }

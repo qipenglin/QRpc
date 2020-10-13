@@ -20,18 +20,16 @@ import java.nio.channels.SocketChannel;
 @Slf4j
 public class NioRpcClient extends AbstractRpcClient {
 
-    @Getter
-    private final ServerInfo serverInfo;
-
-    private SocketChannel channel;
-
     private static final NioEventLoopGroup eventLoopGroup;
-
-    private final NioClientEventLoop eventLoop;
 
     static {
         eventLoopGroup = new NioEventLoopGroup(NioClientEventLoop.group());
     }
+
+    @Getter
+    private final ServerInfo serverInfo;
+    private final NioClientEventLoop eventLoop;
+    private SocketChannel channel;
 
     public NioRpcClient(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;

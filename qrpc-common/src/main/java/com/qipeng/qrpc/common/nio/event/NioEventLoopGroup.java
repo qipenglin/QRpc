@@ -6,16 +6,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class NioEventLoopGroup {
 
+    private final AtomicInteger idx = new AtomicInteger();
     @Getter
     public NioEventLoop[] eventLoops;
 
-    private final AtomicInteger idx = new AtomicInteger();
+    public NioEventLoopGroup(NioEventLoop[] eventLoops) {
+        this.eventLoops = eventLoops;
+    }
 
     public NioEventLoop next() {
         return eventLoops[idx.getAndIncrement() % eventLoops.length];
-    }
-
-    public NioEventLoopGroup(NioEventLoop[] eventLoops) {
-        this.eventLoops = eventLoops;
     }
 }
