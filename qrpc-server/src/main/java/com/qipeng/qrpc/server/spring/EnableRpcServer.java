@@ -1,6 +1,5 @@
 package com.qipeng.qrpc.server.spring;
 
-import com.qipeng.qrpc.common.config.RpcConfig;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.Documented;
@@ -20,6 +19,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({RpcServiceAnnotationPostProcessor.class, RpcServerStarter.class, RpcConfig.class})
+@Import({RpcServiceAnnotationPostProcessor.class, RpcServerStarter.class})
 public @interface EnableRpcServer {
 }

@@ -1,5 +1,6 @@
 package com.qipeng.qrpc.server.spring;
 
+import com.qipeng.qrpc.common.config.RpcConfig;
 import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.registry.Registry;
 import com.qipeng.qrpc.common.registry.RegistryFactory;
@@ -17,9 +18,6 @@ import java.util.Collection;
 @Component
 public class RpcServerStarter implements ApplicationListener<ContextRefreshedEvent> {
 
-    @Value("${qrpc.server.port}")
-    private int port;
-
     private volatile boolean isStarted;
 
     @Override
@@ -36,7 +34,7 @@ public class RpcServerStarter implements ApplicationListener<ContextRefreshedEve
             return;
         }
         String localAddr = NetUtil.getLocalAddress();
-        ServerInfo serverInfo = new ServerInfo(localAddr, port);
+        ServerInfo serverInfo = new ServerInfo(localAddr, RpcConfig.getServerPort());
         RpcServerFactory.getServer().start(serverInfo);
         registerService(RpcServer.PROVIDER_MAP.values(), serverInfo);
         isStarted = true;

@@ -9,7 +9,7 @@ import org.springframework.core.env.Environment;
  */
 public class RpcConfig {
 
-    public static Environment environment;
+    private static Environment environment;
 
     public static void setEnvironment(Environment environment) {
         RpcConfig.environment = environment;
@@ -25,6 +25,10 @@ public class RpcConfig {
 
     public static String getProtocol() {
         return environment.getProperty("qrpc.protocol", "hessian");
+    }
+
+    public static int getServerPort() {
+        return Integer.parseInt(environment.getProperty("qrpc.server.port", "20200"));
     }
 
     public static String getRegistry() {
