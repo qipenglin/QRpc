@@ -3,8 +3,11 @@ package com.qipeng.qrpc.client.spring;
 import com.alibaba.spring.beans.factory.annotation.AbstractAnnotationBeanPostProcessor;
 import com.qipeng.qrpc.client.annotation.RpcReference;
 import com.qipeng.qrpc.client.proxy.ProxyFactory;
+import com.qipeng.qrpc.common.config.RpcConfig;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 
@@ -17,7 +20,7 @@ import java.lang.reflect.Field;
  * @author qipenglin
  * @date Created at 2020/10/12 7:48 下午
  */
-//@Component
+@Component
 public class RpcReferenceAnnotationProcessor extends AbstractAnnotationBeanPostProcessor {
 
     public RpcReferenceAnnotationProcessor() {
@@ -35,5 +38,10 @@ public class RpcReferenceAnnotationProcessor extends AbstractAnnotationBeanPostP
         Field field = (Field) injectedElement.getMember();
         Class<?> clazz = field.getType();
         return clazz.getName();
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        RpcConfig.setEnvironment(environment);
     }
 }

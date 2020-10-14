@@ -19,7 +19,7 @@ public class RpcServerFactory {
             if (server != null) {
                 return server;
             }
-            NetworkModel networkModel = NetworkModel.getByName(RpcConfig.NETWORK_MODEL);
+            NetworkModel networkModel = NetworkModel.getByName(RpcConfig.getNetworkModel());
             switch (networkModel) {
                 case BIO:
                     server = BioRpcServer.getInstance();

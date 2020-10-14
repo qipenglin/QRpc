@@ -1,52 +1,37 @@
 package com.qipeng.qrpc.common.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessorAdapter;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.Ordered;
-import org.springframework.core.PriorityOrdered;
+import com.qipeng.qrpc.common.exception.RpcException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 /**
  * @author qipenglin
  */
-@Component
-public class RpcConfig extends InstantiationAwareBeanPostProcessorAdapter implements PriorityOrdered, EnvironmentAware {
+public class RpcConfig {
 
-    public static String REGISTRY;
-    public static String PROTOCOL;
-    public static String NETWORK_MODEL;
-    public static String PROXY;
+    public static Environment environment;
 
-
-    @Value("${qrpc.registry}")
-    public void setRegistry(String registry) {
-        REGISTRY = registry;
+    public static void setEnvironment(Environment environment) {
+        RpcConfig.environment = environment;
     }
 
-    @Value("${qrpc.protocol:hessian}")
-    public void setProtocolName(String protocol) {
-        PROTOCOL = protocol;
+    public static String getProxy() {
+        return environment.getProperty("qrpc.proxy", "cglib");
     }
 
-    @Value("${qrpc.networkModel:netty}")
-    public void setNetworkModel(String networkModel) {
-        NETWORK_MODEL = networkModel;
+    public static String getNetworkModel() {
+        return environment.getProperty("qrpc.networkModel", "netty");
     }
 
-    @Value("${qrpc.proxy:cglib}")
-    public void setProxy(String proxy) {
-        PROXY = proxy;
+    public static String getProtocol() {
+        return environment.getProperty("qrpc.protocol", "hessian");
     }
 
-    @Override
-    public int getOrder() {
-        return Ordered.HIGHEST_PRECEDENCE;
-    }
-
-    @Override
-    public void setEnvironment(Environment environment) {
-        PROXY = environment.getProperty("qrpc.proxy");
+    public static String getRegistry() {
+        String registry = environment.getProperty("qrpc.registry");
+        if (StringUtils.isBlank(registry)) {
+            throw new RpcException("缺少配置项qrpc.registry，请检查后重新启动");
+        }
+        return registry;
     }
 }

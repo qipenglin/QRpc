@@ -27,7 +27,7 @@ public class RegistryFactory {
     }
 
     public static RegistryConfig getDefaultRegistryConfig() {
-        return buildRegistryConfig(RpcConfig.REGISTRY);
+        return buildRegistryConfig(RpcConfig.getRegistry());
     }
 
     public static RegistryConfig buildRegistryConfig(String uri) {

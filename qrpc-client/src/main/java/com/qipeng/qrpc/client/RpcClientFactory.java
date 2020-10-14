@@ -25,7 +25,7 @@ public class RpcClientFactory {
         }
         synchronized (RpcClientFactory.class) {
             if (clientMap.get(serverInfo) == null) {
-                NetworkModel networkModel = NetworkModel.getByName(RpcConfig.NETWORK_MODEL);
+                NetworkModel networkModel = NetworkModel.getByName(RpcConfig.getNetworkModel());
                 switch (networkModel) {
                     case BIO:
                         client = new BioRpcClient(serverInfo);

@@ -23,7 +23,7 @@ public class ProxySourceFactory {
             if (instance != null) {
                 return instance;
             }
-            switch (RpcConfig.PROXY) {
+            switch (RpcConfig.getProxy()) {
                 case "jdk":
                     return instance = new JdkProxySource();
                 case "cglib":
