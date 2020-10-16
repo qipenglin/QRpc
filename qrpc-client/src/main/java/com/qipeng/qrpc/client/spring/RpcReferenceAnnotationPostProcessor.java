@@ -26,7 +26,7 @@ public class RpcReferenceAnnotationPostProcessor implements BeanPostProcessor {
             field.setAccessible(true);
             if (field.isAnnotationPresent(RpcReference.class)) {
                 try {
-                    Object proxy = ProxyFactory.getProxy(field.getType());
+                    Object proxy = ProxyFactory.createProxy(field.getType());
                     field.set(bean, proxy);
                 } catch (IllegalAccessException e) {
                     log.error("处理RpcReference注解失败,类名:{},字段:{}", clazz.getName(), field.getName());

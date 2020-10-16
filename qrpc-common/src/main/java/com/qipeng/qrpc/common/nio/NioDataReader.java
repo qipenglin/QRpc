@@ -9,7 +9,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 public class NioDataReader {
-
     public static void readData(SelectionKey sk) {
         SocketChannel channel = (SocketChannel) sk.channel();
         NioDataCache nioDataCache = (NioDataCache) sk.attachment();
@@ -18,19 +17,17 @@ public class NioDataReader {
         }
         ByteBuffer buffer = nioDataCache.getBuffer();
         try {
-            //一口气读完全部数据,最多读10次
-            int n = 10;
+            int n = 3; //一口气读完全部数据,最多读3次
             while (n > 0 && buffer.remaining() > 0 && channel.read(buffer) > 0) {
                 n--;
             }
         } catch (Exception e) {
             sk.cancel();
             IOUtils.closeQuietly(channel, null);
-            throw new RpcException("NIO从channel读取数据失败", e);
+            throw new RpcException("NIO从channel读取数据发生异常", e);
         }
-        //buffer转换到读模式
         ((Buffer) buffer).flip();
-        while (buffer.remaining() >= 7) {
+        while (buffer.remaining() >= 7 && !nioDataCache.isFull()) {
             int len = buffer.getInt(buffer.position() + 3);
             if (buffer.remaining() >= len + 7) {
                 byte[] packet = new byte[len + 7];

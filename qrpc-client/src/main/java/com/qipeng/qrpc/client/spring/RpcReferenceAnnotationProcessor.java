@@ -30,7 +30,7 @@ public class RpcReferenceAnnotationProcessor extends AbstractAnnotationBeanPostP
     @Override
     protected Object doGetInjectedBean(AnnotationAttributes annotationAttributes, Object o, String s, Class<?> aClass, InjectionMetadata.InjectedElement injectedElement) throws Exception {
         Field field = (Field) injectedElement.getMember();
-        return ProxyFactory.getProxy(field.getType());
+        return ProxyFactory.createProxy(field.getType());
     }
 
     @Override

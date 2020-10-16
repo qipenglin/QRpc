@@ -9,4 +9,9 @@ public class RegistryConfig {
 
     private final RegistryProtocol protocol;
     private final String address;
+
+    public String toString() {
+        return protocol + "://" + address;
+    }
+
 }

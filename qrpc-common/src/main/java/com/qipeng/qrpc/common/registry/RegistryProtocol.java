@@ -19,4 +19,9 @@ public enum RegistryProtocol {
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return protocol;
+    }
 }

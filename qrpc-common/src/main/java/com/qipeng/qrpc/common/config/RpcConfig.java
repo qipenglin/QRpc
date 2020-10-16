@@ -34,7 +34,7 @@ public class RpcConfig {
     public static String getRegistry() {
         String registry = environment.getProperty("qrpc.registry");
         if (StringUtils.isBlank(registry)) {
-            throw new RpcException("缺少配置项qrpc.registry，请检查后重新启动");
+            throw new RpcException("缺少配置项qrpc.registry,请检查后重新启动");
         }
         return registry;
     }

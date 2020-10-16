@@ -89,7 +89,7 @@ public class SimpleNioRpcServer implements RpcServer {
     private void listen() {
         while (isActivated && selector.isOpen()) {
             try {
-                if (!channelQueue.isEmpty()) {
+                while (!channelQueue.isEmpty()) {
                     SocketChannel channel = channelQueue.poll();
                     channel.register(selector, SelectionKey.OP_READ);
                 }
@@ -117,8 +117,11 @@ public class SimpleNioRpcServer implements RpcServer {
         try {
             NioDataReader.readData(sk);
             NioDataCache cache = (NioDataCache) sk.attachment();
-            while (cache.isReady()) {
+            while (cache != null && cache.isReady()) {
                 byte[] bytes = cache.getData();
+                if (bytes == null) {
+                    continue;
+                }
                 RpcRequest request = RpcPacketSerializer.deserialize(bytes, RpcRequest.class);
                 invokeTheadPool.submit(() -> invokeRpc(request, sk));
             }

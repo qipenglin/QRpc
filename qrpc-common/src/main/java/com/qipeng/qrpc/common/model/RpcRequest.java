@@ -30,7 +30,7 @@ public class RpcRequest extends RpcPacket {
     private Object[] parameters;
 
     public RpcRequest() {
-        this.requestId = requestIdSeed.addAndGet(1);
+        this.requestId = requestIdSeed.getAndIncrement();
     }
 
     @Override

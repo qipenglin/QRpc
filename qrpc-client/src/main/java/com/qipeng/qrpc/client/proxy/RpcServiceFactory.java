@@ -15,6 +15,6 @@ public class RpcServiceFactory {
     }
 
     public <T> Object getService(Class<T> clazz) {
-        return ProxyFactory.getProxy(clazz, registryConfig);
+        return ProxyFactory.createProxy(clazz, registryConfig);
     }
 }

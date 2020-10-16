@@ -1,25 +1,26 @@
 package com.qipeng.qrpc.common.nio;
 
-import lombok.Data;
 import lombok.Getter;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
-@Data
 public class NioDataCache {
 
+    //buffer的默认空间，可改成可配置的
     private static final int CACHE_SIZE = 1024 * 1024;
-
-    //消息暂存队列，最大只能存储size条消息
-    private Queue<byte[]> queue;
-
     @Getter
     private ByteBuffer buffer;
+    //消息暂存队列
+    private Queue<byte[]> queue;
+    //capacity,queue最大只能缓存capacity个包
+    private int capacity;
 
-    public NioDataCache(int size) {
-        queue = new ArrayDeque<>(size);
+    public NioDataCache(int capacity) {
+        queue = new LinkedBlockingDeque<>(capacity);
+        this.capacity = capacity;
         buffer = ByteBuffer.allocate(CACHE_SIZE);
     }
 
@@ -27,8 +28,16 @@ public class NioDataCache {
         return !queue.isEmpty();
     }
 
+    public boolean isFull() {
+        return queue.size() >= capacity;
+    }
+
     public byte[] getData() {
-        return queue.poll();
+        try {
+            return ((LinkedBlockingDeque<byte[]>) queue).poll(10, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            return null;
+        }
     }
 
     public void add(byte[] bytes) {

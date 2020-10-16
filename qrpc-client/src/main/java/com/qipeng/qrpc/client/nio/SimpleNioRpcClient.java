@@ -83,6 +83,9 @@ public class SimpleNioRpcClient extends AbstractRpcClient {
         NioDataCache cache = (NioDataCache) sk.attachment();
         while (cache != null && cache.isReady()) {
             byte[] bytes = cache.getData();
+            if (bytes == null) {
+                continue;
+            }
             RpcResponse response = RpcPacketSerializer.deserialize(bytes, RpcResponse.class);
             RpcFuture future = RpcFuture.getFuture(response.getRequestId());
             if (future != null) {

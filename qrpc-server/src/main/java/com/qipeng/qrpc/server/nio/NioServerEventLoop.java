@@ -10,7 +10,6 @@ import com.qipeng.qrpc.server.RpcInvoker;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -58,24 +57,21 @@ public class NioServerEventLoop extends NioEventLoop {
                     read(sk);
                 }
             }
-        } catch (IOException e) {
-            log.error("", e);
+        } catch (Exception e) {
+            log.error("NioServerEventLoop select error", e);
         }
     }
 
     private void read(SelectionKey sk) {
-        try {
-            NioDataReader.readData(sk);
-            NioDataCache cache = (NioDataCache) sk.attachment();
-            while (cache.isReady()) {
-                byte[] bytes = cache.getData();
-                RpcRequest request = RpcPacketSerializer.deserialize(bytes, RpcRequest.class);
-                invokeTheadPool.execute(() -> invokeRpc(request, sk));
+        NioDataReader.readData(sk);
+        NioDataCache cache = (NioDataCache) sk.attachment();
+        while (cache != null && cache.isReady()) {
+            byte[] bytes = cache.getData();
+            if (bytes == null) {
+                continue;
             }
-        } catch (Exception e) {
-            log.error("NioRpcServer read 发生异常", e);
-            sk.cancel();
-            IOUtils.closeQuietly(sk.channel(), null);
+            RpcRequest request = RpcPacketSerializer.deserialize(bytes, RpcRequest.class);
+            invokeTheadPool.execute(() -> invokeRpc(request, sk));
         }
     }
 
