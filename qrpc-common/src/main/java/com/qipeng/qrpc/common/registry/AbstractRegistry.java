@@ -22,17 +22,12 @@ public abstract class AbstractRegistry implements Registry {
             return serverInfos;
         }
         synchronized (serviceMap) {
-            serverInfos = serviceMap.get(serviceName);
-            if (serverInfos != null) {
-                return serverInfos;
-            }
             try {
-                serverInfos = doGetServerParam(serviceName);
-                serviceMap.put(serviceName, serverInfos);
+                serverInfos = serviceMap.computeIfAbsent(serviceName, this::doGetServerParam);
                 subscribe(serviceName);
                 return serverInfos;
             } catch (Exception e) {
-                log.error("从注册中心获取服务出现异常", e);
+                log.error("从注册中心获取服务器列表出现异常", e);
                 return Collections.emptyList();
             }
         }

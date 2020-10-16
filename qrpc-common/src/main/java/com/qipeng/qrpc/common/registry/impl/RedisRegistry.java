@@ -1,6 +1,5 @@
 package com.qipeng.qrpc.common.registry.impl;
 
-import com.qipeng.qrpc.common.exception.RpcException;
 import com.qipeng.qrpc.common.model.ServerInfo;
 import com.qipeng.qrpc.common.registry.AbstractRegistry;
 import com.qipeng.qrpc.common.registry.RegistryConfig;
@@ -12,6 +11,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -81,7 +81,7 @@ public class RedisRegistry extends AbstractRegistry {
             servers = jedis.smembers("/qrpc/" + serviceName);
         }
         if (servers == null || servers.isEmpty()) {
-            throw new RpcException();
+            return new ArrayList<>();
         }
         return servers.stream()
                       .map(s -> s.split(":"))

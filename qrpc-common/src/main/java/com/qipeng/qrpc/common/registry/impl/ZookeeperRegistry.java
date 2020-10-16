@@ -59,7 +59,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
         try {
             String providerPath = buildProviderPath(serviceName);
             if (!zkClient.checkExists(providerPath)) {
-                return Collections.emptyList();
+                return new ArrayList<>();
             }
             List<String> serverAddrList = zkClient.getChildren(providerPath);
             return buildServerParams(serverAddrList);

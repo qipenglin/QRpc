@@ -18,9 +18,9 @@ public class RpcProxyFactory {
     @SuppressWarnings("unchecked")
     public static <T> T createProxy(Class<T> clazz, RegistryConfig registryConfig) {
         String proxyKey = registryConfig + "/" + clazz.getName();
-        Object proxy = PROXY_MAP.get(proxyKey);
+        T proxy = (T) PROXY_MAP.get(proxyKey);
         if (proxy != null) {
-            return (T) proxy;
+            return  proxy;
         }
         synchronized (RpcProxyFactory.class) {
             return (T) PROXY_MAP.computeIfAbsent(proxyKey, k -> doCreateProxy(clazz, registryConfig));
