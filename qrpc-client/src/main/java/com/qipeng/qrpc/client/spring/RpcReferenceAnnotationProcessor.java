@@ -2,7 +2,7 @@ package com.qipeng.qrpc.client.spring;
 
 import com.alibaba.spring.beans.factory.annotation.AbstractAnnotationBeanPostProcessor;
 import com.qipeng.qrpc.client.annotation.RpcReference;
-import com.qipeng.qrpc.client.proxy.ProxyFactory;
+import com.qipeng.qrpc.client.proxy.RpcProxyFactory;
 import com.qipeng.qrpc.common.config.RpcConfig;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.core.annotation.AnnotationAttributes;
@@ -30,7 +30,7 @@ public class RpcReferenceAnnotationProcessor extends AbstractAnnotationBeanPostP
     @Override
     protected Object doGetInjectedBean(AnnotationAttributes annotationAttributes, Object o, String s, Class<?> aClass, InjectionMetadata.InjectedElement injectedElement) throws Exception {
         Field field = (Field) injectedElement.getMember();
-        return ProxyFactory.createProxy(field.getType());
+        return RpcProxyFactory.createProxy(field.getType());
     }
 
     @Override

@@ -125,6 +125,11 @@
             <artifactId>jedis</artifactId>
             <version>3.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>net.openhft</groupId>
+            <artifactId>affinity</artifactId>
+            <version>3.0.6</version>
+        </dependency>
     </dependencies>
 
 </project>
