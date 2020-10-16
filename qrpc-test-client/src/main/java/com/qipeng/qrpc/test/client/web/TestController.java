@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author qipenglin
@@ -16,9 +18,18 @@ public class TestController {
     @Resource
     private HelloService helloService;
 
-    @RequestMapping("/test")
+    public ExecutorService executorService = Executors.newFixedThreadPool(20);
+
+    @RequestMapping("/test/")
     public void test() {
-        helloService.sayHello();
+            helloService.sayHello();
+    }
+
+    @RequestMapping("/test/concurrent")
+    public void testConcurrent() {
+        for (int i = 0; i < 20; i++) {
+            executorService.execute(() -> helloService.sayHello());
+        }
     }
 
 }

@@ -6,7 +6,6 @@ import com.qipeng.qrpc.server.RpcServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -20,9 +19,9 @@ public class NettyRpcServer implements RpcServer {
     /**
      * 服务端是否已经启动
      */
-    private static NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    private static NioEventLoopGroup workerGroup = new NioEventLoopGroup();
-    private volatile static NettyRpcServer instance;
+    private static final NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
+    private static final NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+    private static volatile NettyRpcServer instance;
     private volatile boolean isActivated;
 
     private NettyRpcServer() {
@@ -65,12 +64,12 @@ public class NettyRpcServer implements RpcServer {
                  .childHandler(new ChannelInitializer<SocketChannel>() {
                      @Override
                      protected void initChannel(SocketChannel channel) throws Exception {
-                         ChannelPipeline pipeline = channel.pipeline();
-                         pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
-                         pipeline.addLast(new PacketCodecHandler());
-                         pipeline.addLast(new DefaultEventLoopGroup(), new NettyRpcRequestHandler());
-                         pipeline.addLast(new IdleStateHandler(31, 0, 0));
-                         pipeline.addLast(new NettyServerHeartBeatHandler());
+                         channel.pipeline()
+                                .addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4))
+                                .addLast(new PacketCodecHandler())
+                                .addLast(new DefaultEventLoopGroup(), new NettyRpcRequestHandler())
+                                .addLast(new IdleStateHandler(31, 0, 0))
+                                .addLast(new NettyServerHeartBeatHandler());
                      }
                  });
         return bootstrap;

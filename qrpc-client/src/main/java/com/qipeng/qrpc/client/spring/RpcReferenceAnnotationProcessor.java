@@ -36,8 +36,9 @@ public class RpcReferenceAnnotationProcessor extends AbstractAnnotationBeanPostP
     @Override
     protected String buildInjectedObjectCacheKey(AnnotationAttributes annotationAttributes, Object o, String s, Class<?> aClass, InjectionMetadata.InjectedElement injectedElement) {
         Field field = (Field) injectedElement.getMember();
+        RpcReference reference = field.getAnnotation(RpcReference.class);
         Class<?> clazz = field.getType();
-        return clazz.getName();
+        return reference.registry() + "/" + clazz.getName();
     }
 
     @Override

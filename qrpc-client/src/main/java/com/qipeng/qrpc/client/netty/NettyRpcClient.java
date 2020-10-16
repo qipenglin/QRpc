@@ -12,7 +12,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -42,14 +41,13 @@ public class NettyRpcClient extends AbstractRpcClient {
                  .channel(NioSocketChannel.class)
                  .handler(new ChannelInitializer<SocketChannel>() {
                      @Override
-                     protected void initChannel(SocketChannel ch) {
-                         // 获取channel中的pipeline
-                         ChannelPipeline pipeline = ch.pipeline();
-                         pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4));
-                         pipeline.addLast(new PacketCodecHandler());
-                         pipeline.addLast(new NettyRpcResponseHandler());
-                         pipeline.addLast(new IdleStateHandler(0, 60, 0));
-                         pipeline.addLast(new NettyClientHeartBeatTrigger());
+                     protected void initChannel(SocketChannel channel) {
+                         channel.pipeline()
+                                .addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 3, 4))
+                                .addLast(new PacketCodecHandler())
+                                .addLast(new NettyRpcResponseHandler())
+                                .addLast(new IdleStateHandler(0, 60, 0))
+                                .addLast(new NettyClientHeartBeatTrigger());
                      }
 
                      @Override

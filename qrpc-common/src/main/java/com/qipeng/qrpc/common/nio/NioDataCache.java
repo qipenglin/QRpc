@@ -8,15 +8,14 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 public class NioDataCache {
-
     //buffer的默认空间，可改成可配置的
     private static final int CACHE_SIZE = 1024 * 1024;
     @Getter
-    private ByteBuffer buffer;
+    private final ByteBuffer buffer;
     //消息暂存队列
-    private Queue<byte[]> queue;
+    private final Queue<byte[]> queue;
     //capacity,queue最大只能缓存capacity个包
-    private int capacity;
+    private final int capacity;
 
     public NioDataCache(int capacity) {
         queue = new LinkedBlockingDeque<>(capacity);
