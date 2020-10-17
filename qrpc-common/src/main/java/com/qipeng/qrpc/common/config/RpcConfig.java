@@ -11,8 +11,16 @@ public class RpcConfig {
 
     private static Environment environment;
 
-    public static void setEnvironment(Environment environment) {
-        RpcConfig.environment = environment;
+    public static void setEnvironment(Environment env) {
+        if (environment != null) {
+            return;
+        }
+        synchronized (RpcConfig.class) {
+            if (environment != null) {
+                return;
+            }
+            environment = env;
+        }
     }
 
     public static String getProxy() {

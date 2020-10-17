@@ -2,16 +2,19 @@ package com.qipeng.qrpc.client.spring;
 
 import com.qipeng.qrpc.client.annotation.RpcReference;
 import com.qipeng.qrpc.client.proxy.RpcProxyFactory;
+import com.qipeng.qrpc.common.config.RpcConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 
 @Slf4j
 @Component
-public class RpcReferenceAnnotationPostProcessor implements BeanPostProcessor {
+public class RpcReferenceAnnotationPostProcessor implements BeanPostProcessor, EnvironmentAware {
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String s) throws BeansException {
@@ -34,5 +37,10 @@ public class RpcReferenceAnnotationPostProcessor implements BeanPostProcessor {
             }
         }
         return bean;
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        RpcConfig.setEnvironment(environment);
     }
 }
