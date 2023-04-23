@@ -27,7 +27,7 @@
         <spring.version>5.0.4.RELEASE</spring.version>
         <project.version>1.0.0-SNAPSHOT</project.version>
         <netty.version>4.1.39.Final</netty.version>
-        <lombok.version>1.18.12</lombok.version>
+        <lombok.version>1.18.26</lombok.version>
         <curator.version>4.2.0</curator.version>
         <jackson.version>2.9.9</jackson.version>
         <zk.version>3.4.11</zk.version>
@@ -181,8 +181,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <debug>true</debug>
                     <parameters>true</parameters>
                     <verbose>false</verbose>
