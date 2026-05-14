@@ -1,6 +1,6 @@
 package com.qipeng.qrpc.common.serialize.impl;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.qipeng.qrpc.common.serialize.Serializer;
 import com.qipeng.qrpc.common.serialize.SerializerProtocol;
 

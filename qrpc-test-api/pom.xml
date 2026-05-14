@@ -7,11 +7,15 @@
     <artifactId>qrpc-test-api</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <parent>
+        <artifactId>Q-Rpc</artifactId>
+        <groupId>com.qipeng</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.26</version>
         </dependency>
     </dependencies>
 

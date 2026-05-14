@@ -1,44 +1,40 @@
 package com.qipeng.qrpc.client.spring;
 
-import com.alibaba.spring.beans.factory.annotation.AbstractAnnotationBeanPostProcessor;
 import com.qipeng.qrpc.client.annotation.RpcReference;
 import com.qipeng.qrpc.client.proxy.RpcProxyFactory;
 import com.qipeng.qrpc.common.config.RpcConfig;
-import org.springframework.beans.factory.annotation.InjectionMetadata;
-import org.springframework.core.annotation.AnnotationAttributes;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 
-/**
- *
- * Company: www.vivo.com
- * Copyright: (c) All Rights Reserved.
- * Information:
- *
- * @author qipenglin
- * @date Created at 2020/10/12 7:48 下午
- */
-@Component
-public class RpcReferenceAnnotationProcessor extends AbstractAnnotationBeanPostProcessor {
+@Slf4j
+public class RpcReferenceAnnotationProcessor implements BeanPostProcessor, EnvironmentAware {
 
-    public RpcReferenceAnnotationProcessor() {
-        super(RpcReference.class);
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
     }
 
     @Override
-    protected Object doGetInjectedBean(AnnotationAttributes annotationAttributes, Object o, String s, Class<?> aClass, InjectionMetadata.InjectedElement injectedElement) throws Exception {
-        Field field = (Field) injectedElement.getMember();
-        return RpcProxyFactory.createProxy(field.getType());
-    }
-
-    @Override
-    protected String buildInjectedObjectCacheKey(AnnotationAttributes annotationAttributes, Object o, String s, Class<?> aClass, InjectionMetadata.InjectedElement injectedElement) {
-        Field field = (Field) injectedElement.getMember();
-        RpcReference reference = field.getAnnotation(RpcReference.class);
-        Class<?> clazz = field.getType();
-        return reference.registry() + "/" + clazz.getName();
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        Class<?> clazz = bean.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true);
+            if (field.isAnnotationPresent(RpcReference.class)) {
+                try {
+                    Object proxy = RpcProxyFactory.createProxy(field.getType());
+                    field.set(bean, proxy);
+                } catch (IllegalAccessException e) {
+                    log.error("处理RpcReference注解失败,类名:{},字段:{}", clazz.getName(), field.getName());
+                }
+            }
+        }
+        return bean;
     }
 
     @Override
