@@ -5,8 +5,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.0.0.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>3.5.14</version>
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.qipeng</groupId>
@@ -23,14 +23,25 @@
         <module>qrpc-all</module>
     </modules>
     <properties>
-        <spring-boot.version>2.0.0.RELEASE</spring-boot.version>
-        <spring.version>5.0.4.RELEASE</spring.version>
+        <spring-boot.version>3.5.14</spring-boot.version>
+        <spring.version>6.2.12</spring.version>
         <project.version>1.0.0-SNAPSHOT</project.version>
-        <netty.version>4.1.39.Final</netty.version>
-        <lombok.version>1.18.26</lombok.version>
-        <curator.version>4.2.0</curator.version>
-        <jackson.version>2.9.9</jackson.version>
-        <zk.version>3.4.11</zk.version>
+        <netty.version>4.1.122.Final</netty.version>
+        <lombok.version>1.18.44</lombok.version>
+        <curator.version>5.9.0</curator.version>
+        <jackson.version>2.18.4</jackson.version>
+        <zk.version>3.9.5</zk.version>
+        <fastjson2.version>2.0.62</fastjson2.version>
+        <hessian.version>4.0.66</hessian.version>
+        <protostuff.version>1.8.0</protostuff.version>
+        <jedis.version>5.2.1</jedis.version>
+        <cglib.version>3.3.0</cglib.version>
+        <affinity.version>3.23.3</affinity.version>
+        <commons-lang3.version>3.17.0</commons-lang3.version>
+        <commons-io.version>2.19.0</commons-io.version>
+        <commons-collections4.version>4.5.0</commons-collections4.version>
+        <log4j2.version>2.24.3</log4j2.version>
+        <slf4j.version>2.0.17</slf4j.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -96,51 +107,46 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.24</version>
+                <version>${slf4j.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
-                <version>2.8.1</version>
+                <artifactId>log4j-slf4j2-impl</artifactId>
+                <version>${log4j2.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
-                <version>2.8.1</version>
+                <version>${log4j2.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
-                <version>2.8.1</version>
+                <version>${log4j2.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.caucho</groupId>
                 <artifactId>hessian</artifactId>
-                <version>3.1.5</version>
+                <version>${hessian.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.3.2</version>
+                <version>${commons-lang3.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.7</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.6</version>
+                <version>${commons-io.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
-                <version>4.0</version>
+                <version>${commons-collections4.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
@@ -179,10 +185,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <version>3.14.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>21</source>
+                    <target>21</target>
                     <debug>true</debug>
                     <parameters>true</parameters>
                     <verbose>false</verbose>
